@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="search_option">
+        <item>@string/search_archlinux</item>
+        <item>@string/search_debian</item>
+        <item>@string/search_ubuntu</item>
+        <item>@string/search_loongnix</item>
+    </string-array>
+</resources>

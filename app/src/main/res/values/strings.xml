@@ -1,0 +1,26 @@
+<resources>
+    <string name="app_name">Haku Package Search</string>
+    <string name="title_search">Search</string>
+    <string name="title_favourite">Favourite</string>
+    <string name="title_settings">Settings</string>
+    <string name="search_title">Click to search</string>
+    <string name="search_fast">Request too fast!</string>
+    <string name="search_progress">Loading...</string>
+    <string name="search_nohistory">No search history.</string>
+    <string name="search_noresult">No package found.</string>
+    <string name="search_search">Search</string>
+    <string name="search_detail">Details</string>
+    <string name="search_error">Search error.</string>
+    <string name="search_stared">Stared</string>
+    <string name="search_unstared">Unstared</string>
+    <string name="fav_title">My favourites</string>
+    <string name="quit_confirm">Press again to exit.</string>
+    <string name="network_error">Network error.</string>
+    <string name="database_file">history.db</string>
+    <string name="button_ok">OK</string>
+
+    <string name="search_loongnix">Loongnix</string>
+    <string name="search_debian">Debian</string>
+    <string name="search_ubuntu">Ubuntu</string>
+    <string name="search_archlinux">Archlinux</string>
+</resources>
