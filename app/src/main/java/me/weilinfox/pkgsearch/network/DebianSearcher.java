@@ -18,7 +18,7 @@ import me.weilinfox.pkgsearch.utils.Constraints;
 public class DebianSearcher extends NetworkSearcher {
 
     private static String TAG = "debianSearcher";
-    private String _option;
+    private String mOption;
     private String baseUrl = Constraints.debianBaseUrl;
     private String searchUrl = Constraints.debianSearchUrl;
     private HashMap<String, String> param = new HashMap<String, String>() {
@@ -32,7 +32,7 @@ public class DebianSearcher extends NetworkSearcher {
 
     public DebianSearcher(@NotNull Context context, @NotNull Handler handler) {
         super(context, handler);
-        this._option = _context.getResources().getString(R.string.search_debian);
+        this.mOption = mContext.getResources().getString(R.string.search_debian);
     }
 
     public static class PackageClass extends SearchResult {
@@ -72,19 +72,19 @@ public class DebianSearcher extends NetworkSearcher {
     public ArrayList<SearchResult> getResults() {
         ArrayList<SearchResult> searchResults = new ArrayList<>();
 
-        if (this._content == null) {
+        if (this.mContent == null) {
             return searchResults;
         }
-        //Log.d(TAG, this._content);
+        //Log.d(TAG, this.mContent);
 
-        this._content = this._content.replace("\n", "").replace("\t", " ");
+        this.mContent = this.mContent.replace("\n", "").replace("\t", " ");
         String pat = "<h3>.*?</ul>";
         String disPat = "<li.*?</li>";
         String[] itmPat = new String[]{
                 "<h3>(.*?)</h3>", "href=\"(.*?)\"", "<a.*?>(.*?)</a>", "</a>(.*?)<br>", "<br>(.*?)</li>"};
         String[] itmStr = new String[6];
         Pattern pattern = Pattern.compile(pat);
-        Matcher matcher = pattern.matcher(this._content);
+        Matcher matcher = pattern.matcher(this.mContent);
         ArrayList<String> itms = new ArrayList<>();
         PackageClass packageClass;
 
@@ -139,7 +139,7 @@ public class DebianSearcher extends NetworkSearcher {
                                 itmStr[5] = strings[1].trim();
 
                                 // 单个包
-                                packageClass = new PackageClass(itmStr[0], itmStr[4], this._option);
+                                packageClass = new PackageClass(itmStr[0], itmStr[4], this.mOption);
                                 packageClass.setUrl(this.baseUrl+itmStr[1]);
                                 packageClass.setDestribution(itmStr[2]);
                                 packageClass.setDescription(itmStr[3]);
@@ -157,12 +157,12 @@ public class DebianSearcher extends NetworkSearcher {
 
 
         // 清空
-        this._content = null;
+        this.mContent = null;
         return searchResults;
     }
 
-    public void set_option(String _option) {
-        this._option = _option;
+    public void setOption(String option) {
+        this.mOption = option;
     }
 
     public void setBaseUrl(String baseUrl) {

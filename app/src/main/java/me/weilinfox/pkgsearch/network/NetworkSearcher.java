@@ -30,13 +30,13 @@ import me.weilinfox.pkgsearch.utils.NetworkUtils;
 
 public abstract class NetworkSearcher {
     private static final String TAG = "NetworkSearcher";
-    protected String _content = null;
-    protected Context _context = null;
-    protected Handler _handler = null;
+    protected String mContent = null;
+    protected Context mContext = null;
+    protected Handler mHandler = null;
 
     public NetworkSearcher(@NotNull Context context, @NotNull Handler handler) {
-        this._context = context;
-        this._handler = handler;
+        this.mContext = context;
+        this.mHandler = handler;
     }
 
     /**
@@ -55,7 +55,7 @@ public abstract class NetworkSearcher {
     }
 
     /**
-     * 在子线程中发送 get 请求，结果保存在 this._content ，handler 支持搜索进度条
+     * 在子线程中发送 get 请求，结果保存在 this.mContent ，handler 支持搜索进度条
      * @param domain url
      * @param param 参数
      */
@@ -66,7 +66,7 @@ public abstract class NetworkSearcher {
             public void run() {
                 Message message = Message.obtain();
                 message.what = Constraints.searchStart;
-                _handler.sendMessage(message);
+                mHandler.sendMessage(message);
 
                 try {
                     String url = NetworkUtils.urlBuild(domain, param);
@@ -82,7 +82,7 @@ public abstract class NetworkSearcher {
 
                     message = Message.obtain();
                     message.what = 20;
-                    _handler.sendMessage(message);
+                    mHandler.sendMessage(message);
 
                     int code = connection.getResponseCode();
                     if (code == HttpURLConnection.HTTP_OK) {
@@ -100,26 +100,26 @@ public abstract class NetworkSearcher {
                             if (now > last) {
                                 message = Message.obtain();
                                 message.what = last = now;
-                                _handler.sendMessage(message);
+                                mHandler.sendMessage(message);
                             }
                         }
-                        _content = bs.toString();
+                        mContent = bs.toString();
                     }
                     connection.disconnect();
                 } catch (ProtocolException e) {
                     Log.e(TAG, "sendRequest: " + e.toString());
-                    _content = null;
+                    mContent = null;
                 } catch (IOException e) {
                     Log.e(TAG, "sendRequest: " + e.toString());
-                    _content = null;
+                    mContent = null;
                 } catch (SecurityException e) {
                     Log.e(TAG, "sendRequest: " + e.toString());
-                    _content = null;
+                    mContent = null;
                 }
 
                 message = Message.obtain();
                 message.what = 80;
-                _handler.sendMessage(message);
+                mHandler.sendMessage(message);
                 checkResult();
             }
         }).start();
@@ -130,23 +130,23 @@ public abstract class NetworkSearcher {
      */
     protected final void checkResult() {
         Message message = Message.obtain();
-        if (_content == null) {
+        if (mContent == null) {
             Log.d(TAG, "showResult: search error.");
             message.what = Constraints.searchError;
         } else {
             Log.d(TAG, "showResult: search finished.");
             message.what = Constraints.searchFinished;
         }
-        _handler.sendMessage(message);
+        mHandler.sendMessage(message);
     }
 
     protected final void searchCache(@NotNull String option) {
         Message message = Message.obtain();
         message.what = Constraints.searchStart;
-        _handler.sendMessage(message);
+        mHandler.sendMessage(message);
 
         message = Message.obtain();
         message.what = Constraints.searchFinished;
-        _handler.sendMessage(message);
+        mHandler.sendMessage(message);
     }
 }

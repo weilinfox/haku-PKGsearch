@@ -21,7 +21,7 @@ import me.weilinfox.pkgsearch.network.DebianSearcher.PackageClass;
 public class UbuntuSearcher extends DebianSearcher {
     public UbuntuSearcher(@NotNull Context context, @NotNull Handler handler) {
         super(context, handler);
-        super.set_option(_context.getResources().getString(R.string.search_ubuntu));
+        super.setOption(mContext.getResources().getString(R.string.search_ubuntu));
         setBaseUrl(Constraints.ubuntuBaseUrl);
         setSearchUrl(Constraints.ubuntuSearchUrl);
         setParam(new HashMap<String, String>() {

@@ -16,7 +16,8 @@
     <string name="fav_title">My favourites</string>
     <string name="quit_confirm">Press again to exit.</string>
     <string name="network_error">Network error.</string>
-    <string name="database_file">history.db</string>
+    <string name="database_file">main.db</string>
+    <string name="database_error">Database error.</string>
     <string name="button_ok">OK</string>
 
     <string name="search_loongnix">Loongnix</string>

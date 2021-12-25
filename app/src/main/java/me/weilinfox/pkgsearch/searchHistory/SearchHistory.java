@@ -2,7 +2,11 @@ package me.weilinfox.pkgsearch.searchHistory;
 
 import androidx.annotation.Nullable;
 
+import org.jetbrains.annotations.NotNull;
+
+import java.util.Comparator;
 import java.util.Date;
+import java.util.Objects;
 
 /**
  * 搜索历史
@@ -12,13 +16,19 @@ public class SearchHistory {
     private String option;
     private Date date;
 
-    public SearchHistory(String keyword, String option, Date date) {
+    public SearchHistory(@NotNull String keyword, @NotNull String option, Date date) {
         this.keyword = keyword;
         this.date = date;
         this.option = option;
     }
 
-    public SearchHistory(String keyword, String option) {
+    public SearchHistory(@NotNull String keyword, @NotNull String option, Long millisecond) {
+        this.keyword = keyword;
+        this.date = new Date(millisecond);
+        this.option = option;
+    }
+
+    public SearchHistory(@NotNull String keyword, @NotNull String option) {
         this.keyword = keyword;
         this.option = option;
         this.date = new Date();
@@ -34,6 +44,13 @@ public class SearchHistory {
 
     public Date getDate() {
         return date;
+    }
+
+
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(this.keyword, this.option);
     }
 
     @Override

@@ -31,7 +31,7 @@ public class SearchResultFactory {
     /**
      * 上下文
      */
-    private Context context;
+    private Context mContext;
     private Handler handler;
     /**
      * 选项与搜索类映射
@@ -44,14 +44,14 @@ public class SearchResultFactory {
      */
     public SearchResultFactory(Context context, Handler handler) {
         searchResults = new ArrayList<SearchResult>();
-        this.context = context;
+        this.mContext = context;
         this.handler = handler;
         this.searchClasses = new HashMap<String, Class<?>>() {
             {
-                put(context.getResources().getString(R.string.search_archlinux), ArchlinuxSearcher.class);
-                put(context.getResources().getString(R.string.search_debian), DebianSearcher.class);
-                put(context.getResources().getString(R.string.search_ubuntu), UbuntuSearcher.class);
-                put(context.getResources().getString(R.string.search_loongnix), LoongnixSearcher.class);
+                put(mContext.getResources().getString(R.string.search_archlinux), ArchlinuxSearcher.class);
+                put(mContext.getResources().getString(R.string.search_debian), DebianSearcher.class);
+                put(mContext.getResources().getString(R.string.search_ubuntu), UbuntuSearcher.class);
+                put(mContext.getResources().getString(R.string.search_loongnix), LoongnixSearcher.class);
             }
         };
     }
@@ -76,13 +76,13 @@ public class SearchResultFactory {
             else {
                 Constructor constructor = searchClass.getDeclaredConstructor(new Class[]{Context.class, Handler.class});
                 constructor.setAccessible(true);
-                NetworkSearcher networkSearcher = (NetworkSearcher) constructor.newInstance(context, handler);
+                NetworkSearcher networkSearcher = (NetworkSearcher) constructor.newInstance(mContext, handler);
                 this.networkSearcher = networkSearcher;
                 networkSearcher.search(keyword);
             }
         } catch (NoSuchMethodException | InvocationTargetException | IllegalAccessException | InstantiationException e) {
             Log.e(TAG, "searchPackages: " + e.getStackTrace());
-            Toast.makeText(this.context, context.getString(R.string.search_error), Toast.LENGTH_LONG).show();
+            Toast.makeText(this.mContext, this.mContext.getString(R.string.search_error), Toast.LENGTH_LONG).show();
 
             return false;
         }

@@ -28,7 +28,7 @@ import me.weilinfox.pkgsearch.utils.Constraints;
 public class ArchlinuxSearcher extends NetworkSearcher {
 
     private static final String TAG = "archlinuxSearcher";
-    private String _option;
+    private String mOption;
     private HashMap<String, String> param = new HashMap<String, String>() {
         {
             //put("sort", "pkgname");
@@ -40,7 +40,7 @@ public class ArchlinuxSearcher extends NetworkSearcher {
 
     public ArchlinuxSearcher(@NotNull Context context, @NotNull Handler handler) {
         super(context, handler);
-        this._option = _context.getResources().getString(R.string.search_archlinux);
+        this.mOption = mContext.getResources().getString(R.string.search_archlinux);
     }
 
     public static class PackageClass extends SearchResult {
@@ -98,12 +98,12 @@ public class ArchlinuxSearcher extends NetworkSearcher {
     public ArrayList<SearchResult> getResults() {
         ArrayList<SearchResult> searchResults = new ArrayList<>();
 
-        if (this._content == null) {
+        if (this.mContent == null) {
             return searchResults;
         }
-        //Log.d(TAG, this._content);
+        //Log.d(TAG, this.mContent);
 
-        this._content = this._content.replace("\n", "");
+        this.mContent = this.mContent.replace("\n", "");
         String pat = "<table class=\"results\">(.*?)</table>";
         String subPat = "<tr>(.*?)</tr>";
         String itmsPat = "<td.*?</td>";
@@ -113,7 +113,7 @@ public class ArchlinuxSearcher extends NetworkSearcher {
         Pattern subPattern = Pattern.compile(subPat);
         Pattern itmsPattern = Pattern.compile(itmsPat);
         Pattern itmPattern;
-        Matcher matcher = pattern.matcher(this._content);
+        Matcher matcher = pattern.matcher(this.mContent);
         ArrayList<String> itms = new ArrayList<>();
         String[] result = new String[8];
 
@@ -136,7 +136,7 @@ public class ArchlinuxSearcher extends NetworkSearcher {
                             itmsMat = itmPattern.matcher(itms.get(i));
                             flag &= itmsMat.find();
                             if (flag) {
-                                result[i] = itmsMat.group(1).replace("<.*?>", "").trim();
+                                result[i] = itmsMat.group(1).replaceAll("<.*?>", "").trim();
                             } else {
                                 break;
                             }
@@ -146,7 +146,7 @@ public class ArchlinuxSearcher extends NetworkSearcher {
                     }
 
                     if (flag) {
-                        PackageClass pkg = new PackageClass(result[2], result[3], this._option);
+                        PackageClass pkg = new PackageClass(result[2], result[3], this.mOption);
                         pkg.setArchitecture(result[0]);
                         pkg.setRepo(result[1]);
                         pkg.setUrl(Constraints.archlinuxBaseUrl + result[7]);
@@ -162,7 +162,7 @@ public class ArchlinuxSearcher extends NetworkSearcher {
         }
 
         // 清空
-        this._content = null;
+        this.mContent = null;
         return searchResults;
     }
 }

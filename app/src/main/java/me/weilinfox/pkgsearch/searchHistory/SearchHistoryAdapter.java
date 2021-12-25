@@ -63,7 +63,7 @@ public class SearchHistoryAdapter extends ArrayAdapter<SearchHistory> {
             viewHolder = (ViewHolder) view.getTag();
         }
 
-        if (searchHistory.getKeyword() == null) {
+        if (searchHistory.getOption() == null || searchHistory.getOption().length() == 0) {
             view.setEnabled(false);
             viewHolder.info.setText(R.string.search_nohistory);
             viewHolder.title.setText("");
@@ -81,9 +81,9 @@ public class SearchHistoryAdapter extends ArrayAdapter<SearchHistory> {
                 @Override
                 public void onClick(View view) {
                     if (searchHistoryFactory != null) {
-                        searchHistoryFactory.getSearchHistories().remove(position);
+                        searchHistoryFactory.deleteSearchHistory(searchHistory);
                         if (searchHistoryFactory.getSearchHistories().size() == 0) {
-                            searchHistoryFactory.getSearchHistories().add(new SearchHistory(null, null));
+                            searchHistoryFactory.getSearchHistories().add(new SearchHistory("", ""));
                         }
 
                         SearchHistoryAdapter.super.notifyDataSetChanged();

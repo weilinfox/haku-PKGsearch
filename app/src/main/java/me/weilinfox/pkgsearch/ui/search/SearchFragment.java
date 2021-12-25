@@ -147,7 +147,7 @@ public class SearchFragment extends Fragment {
 
         searchResultFactory = new SearchResultFactory(this.getContext(), handler);
 
-        searchHistoryFactory = searchViewModel.getSearchHistory();
+        searchHistoryFactory = searchViewModel.getSearchHistory(this.getContext());
         ArrayList<SearchHistory> searchHistories = searchHistoryFactory.getSearchHistories();
         View root = binding.getRoot();
         SearchView searchView = binding.searchBar;
@@ -174,26 +174,22 @@ public class SearchFragment extends Fragment {
 
         if (context != null) {
             if (searchHistories.size() == 0) {
-                ArrayList<SearchHistory> emptyHistoryList = new ArrayList<SearchHistory>();
-                emptyHistoryList.add(new SearchHistory(null, null));
-                SearchHistoryAdapter adapter = new SearchHistoryAdapter(context, R.layout.history_item, emptyHistoryList);
-                historyView.setAdapter(adapter);
-            } else {
-                SearchHistoryAdapter adapter = new SearchHistoryAdapter(context, R.layout.history_item, searchHistoryFactory);
-                historyView.setAdapter(adapter);
-                historyView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-                    @Override
-                    public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                        SearchHistory searchHistory = searchHistories.get(i);
-                        String keyword = searchHistory.getKeyword();
-                        String option = searchHistory.getOption();
-
-                        if (keyword != null && option != null) {
-                            onSearch(keyword, option);
-                        }
-                    }
-                });
+                searchHistories.add(new SearchHistory("", ""));
             }
+            SearchHistoryAdapter adapter = new SearchHistoryAdapter(context, R.layout.history_item, searchHistoryFactory);
+            historyView.setAdapter(adapter);
+            historyView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                @Override
+                public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                    SearchHistory searchHistory = searchHistories.get(i);
+                    String keyword = searchHistory.getKeyword();
+                    String option = searchHistory.getOption();
+
+                    if (keyword != null && option != null) {
+                        onSearch(keyword, option);
+                    }
+                }
+            });
         } else {
             Log.e(TAG, "onCreateView: Content is null.");
         }

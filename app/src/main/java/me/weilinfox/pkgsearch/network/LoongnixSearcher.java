@@ -19,11 +19,11 @@ import me.weilinfox.pkgsearch.utils.Constraints;
 
 public class LoongnixSearcher extends NetworkSearcher {
     private static final String TAG = "loongnixSearcher";
-    private String _option;
+    private String mOption;
 
     public LoongnixSearcher(@NotNull Context context, @NotNull Handler handler) {
         super(context, handler);
-        this._option = _context.getResources().getString(R.string.search_loongnix);
+        this.mOption = mContext.getResources().getString(R.string.search_loongnix);
     }
 
     public static class PackageClass extends SearchResult {
@@ -34,7 +34,7 @@ public class LoongnixSearcher extends NetworkSearcher {
 
     @Override
     public void search(String keyword) {
-        super.searchCache(this._option);
+        super.searchCache(this.mOption);
     }
 
     @Override

@@ -1,32 +1,34 @@
 package me.weilinfox.pkgsearch.searchHistory;
 
+import android.content.Context;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
+import android.util.Log;
+import android.widget.Toast;
+
 import java.util.ArrayList;
+import java.util.Collections;
+
+import me.weilinfox.pkgsearch.R;
+import me.weilinfox.pkgsearch.database.DatabaseHelper;
+import me.weilinfox.pkgsearch.network.DebianSearcher;
+import me.weilinfox.pkgsearch.utils.HistoryList;
 
 public class SearchHistoryFactory {
+    private static final String TAG = "SearchHistoryFactory";
     private ArrayList<SearchHistory> searchHistories;
+    private Context mContext;
 
-    public SearchHistoryFactory() {
-        this.searchHistories = new ArrayList<SearchHistory>();
+    public SearchHistoryFactory(Context context) {
+        HistoryList.initDatabase(context);
+        this.mContext = context;
     }
 
     /**
      * 从数据库中读取搜索历史
      */
     public void readSearchHistory() {
-        searchHistories.add(new SearchHistory("linux", "Archlinux"));
-        searchHistories.add(new SearchHistory("qemu", "Archlinux"));
-        searchHistories.add(new SearchHistory("qemu", "Debian"));
-        searchHistories.add(new SearchHistory("linux", "Debian"));
-        searchHistories.add(new SearchHistory("qemu", "Ubuntu"));
-        searchHistories.add(new SearchHistory("linux", "Ubuntu"));
-        searchHistories.add(new SearchHistory("qemu", "Loongnix"));
-        searchHistories.add(new SearchHistory("linux", "Loongnix"));
-        searchHistories.add(new SearchHistory("qemu", "Archlinu"));
-        searchHistories.add(new SearchHistory("qemu", "Archlinu"));
-        searchHistories.add(new SearchHistory("qemu", "Archlinux"));
-        searchHistories.add(new SearchHistory("qemu", "Archlinux"));
-
-        // TODO: 从缓存读取
+        this.searchHistories = HistoryList.readDatabase();
     }
 
     /**
@@ -34,10 +36,20 @@ public class SearchHistoryFactory {
      * @param item
      */
     public void addSearchHistory(SearchHistory item) {
-        this.searchHistories.remove(item);
+        if (this.searchHistories.size() <= 1) {
+            this.searchHistories.remove(new SearchHistory("", ""));
+        }
+        try {
+            if (this.searchHistories.remove(item)) {
+                HistoryList.onUpdate(item);
+            } else {
+                HistoryList.onInsert(item);
+            }
+        } catch (Exception e) {
+            Toast.makeText(mContext, R.string.database_error, Toast.LENGTH_LONG).show();
+            Log.e(TAG, "addSearchHistory: " + e.getStackTrace());
+        }
         this.searchHistories.add(0, item);
-
-        // TODO: 添加项目到数据库
     }
 
     /**
@@ -45,9 +57,8 @@ public class SearchHistoryFactory {
      * @param item
      */
     public void deleteSearchHistory(SearchHistory item) {
+        HistoryList.onRemove(item);
         this.searchHistories.remove(item);
-
-        // TODO: 从数据库删除项目
     }
 
     public ArrayList<SearchHistory> getSearchHistories() {
