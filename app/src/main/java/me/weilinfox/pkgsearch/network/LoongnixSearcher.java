@@ -2,20 +2,13 @@ package me.weilinfox.pkgsearch.network;
 
 import android.content.Context;
 import android.os.Handler;
-import android.util.Log;
-
-import androidx.annotation.NonNull;
 
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import me.weilinfox.pkgsearch.R;
 import me.weilinfox.pkgsearch.searchResult.SearchResult;
-import me.weilinfox.pkgsearch.utils.Constraints;
 
 public class LoongnixSearcher extends NetworkSearcher {
     private static final String TAG = "loongnixSearcher";

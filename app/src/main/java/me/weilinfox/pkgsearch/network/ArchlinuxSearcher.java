@@ -2,19 +2,10 @@ package me.weilinfox.pkgsearch.network;
 
 import android.content.Context;
 import android.os.Handler;
-import android.os.NetworkOnMainThreadException;
 import android.util.Log;
 
 import org.jetbrains.annotations.NotNull;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.net.URLConnection;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.regex.Matcher;
@@ -23,7 +14,6 @@ import java.util.regex.Pattern;
 import me.weilinfox.pkgsearch.R;
 import me.weilinfox.pkgsearch.searchResult.SearchResult;
 import me.weilinfox.pkgsearch.utils.NetworkUtils;
-import me.weilinfox.pkgsearch.utils.Constraints;
 
 public class ArchlinuxSearcher extends NetworkSearcher {
 

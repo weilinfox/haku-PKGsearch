@@ -1,9 +1,6 @@
 package me.weilinfox.pkgsearch.ui.favourite;
 
 import android.content.Context;
-import android.graphics.drawable.Drawable;
-import android.media.Image;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,14 +13,12 @@ import androidx.annotation.Nullable;
 
 import org.jetbrains.annotations.NotNull;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 
 import me.weilinfox.pkgsearch.R;
 import me.weilinfox.pkgsearch.network.ArchlinuxSearcher;
 import me.weilinfox.pkgsearch.network.DebianSearcher;
 import me.weilinfox.pkgsearch.searchResult.SearchResult;
-import me.weilinfox.pkgsearch.searchResult.SearchResultAdapter;
 import me.weilinfox.pkgsearch.utils.StarList;
 
 public class FavouriteAdapter extends ArrayAdapter<SearchResult> {

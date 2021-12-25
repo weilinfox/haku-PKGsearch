@@ -13,7 +13,6 @@ import java.util.regex.Pattern;
 
 import me.weilinfox.pkgsearch.R;
 import me.weilinfox.pkgsearch.searchResult.SearchResult;
-import me.weilinfox.pkgsearch.utils.Constraints;
 import me.weilinfox.pkgsearch.utils.NetworkUtils;
 
 public class DebianSearcher extends NetworkSearcher {
