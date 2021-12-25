@@ -98,7 +98,7 @@ public class MainActivity extends AppCompatActivity {
         }
 
         // 初始化数据库
-        StarList.initFile(getString(R.string.database_file));
+        StarList.initDatabase(this);
     }
 
     @Override

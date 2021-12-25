@@ -2,6 +2,8 @@ package me.weilinfox.pkgsearch.ui.search;
 
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
+import android.content.ClipData;
+import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.os.Bundle;
@@ -154,6 +156,7 @@ public class SearchFragment extends Fragment {
         ListView historyView = binding.searchHistory;
         Context context = this.getContext();
 
+        // 默认展开搜索框
         searchView.setIconifiedByDefault(false);
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
@@ -172,27 +175,42 @@ public class SearchFragment extends Fragment {
             }
         });
 
-        if (context != null) {
-            if (searchHistories.size() == 0) {
-                searchHistories.add(new SearchHistory("", ""));
-            }
-            SearchHistoryAdapter adapter = new SearchHistoryAdapter(context, R.layout.history_item, searchHistoryFactory);
-            historyView.setAdapter(adapter);
-            historyView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-                @Override
-                public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                    SearchHistory searchHistory = searchHistories.get(i);
-                    String keyword = searchHistory.getKeyword();
-                    String option = searchHistory.getOption();
-
-                    if (keyword != null && option != null) {
-                        onSearch(keyword, option);
-                    }
-                }
-            });
-        } else {
-            Log.e(TAG, "onCreateView: Content is null.");
+        // 历史为空则插入无历史标签
+        if (searchHistories.size() == 0) {
+            /*
+            如果 option 为 "" ，那么会被认为需要显示无历史记录的标签
+            这个记录会在插入新历史记录时被删除 by weilinfox
+             */
+            searchHistories.add(new SearchHistory("", ""));
         }
+        // 设置 ListView 适配器
+        SearchHistoryAdapter adapter = new SearchHistoryAdapter(context, R.layout.history_item, searchHistoryFactory);
+        historyView.setAdapter(adapter);
+        historyView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                SearchHistory searchHistory = searchHistories.get(i);
+                String keyword = searchHistory.getKeyword();
+                String option = searchHistory.getOption();
+
+                if (keyword != null && option != null) {
+                    onSearch(keyword, option);
+                }
+            }
+        });
+        historyView.setLongClickable(true);
+        historyView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+            @Override
+            public boolean onItemLongClick(AdapterView<?> adapterView, View view, int i, long l) {
+                // 复制关键字
+                ClipboardManager clipboardManager = (ClipboardManager) getContext().getSystemService(Context.CLIPBOARD_SERVICE);
+                String key = searchHistories.get(i).getKeyword();
+                ClipData mClipData = ClipData.newPlainText(null, key);
+                clipboardManager.setPrimaryClip(mClipData);
+                Toast.makeText(getContext(), getResources().getString(R.string.clipboard_keyword), Toast.LENGTH_SHORT).show();
+                return true;
+            }
+        });
 
         TextView spaceHolder = binding.searchHold;
         spaceHolder.setHeight(NavigationViewUtil.height);

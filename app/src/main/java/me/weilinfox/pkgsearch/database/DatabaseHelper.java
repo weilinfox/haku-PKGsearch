@@ -9,7 +9,7 @@ import androidx.annotation.Nullable;
 import org.jetbrains.annotations.NotNull;
 
 public class DatabaseHelper extends SQLiteOpenHelper {
-    private static final int version = 1;
+    private static final int version = 2;
     private Context mContext;
     private final String CREATE_HISTORY = "CREATE TABLE IF NOT EXISTS history(" +
                                                         "name text," +
@@ -19,7 +19,9 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     private final String CREATE_STAR = "CREATE TABLE IF NOT EXISTS star(" +
                                                         "name text," +
                                                         "option text," +
-                                                        "version text);";
+                                                        "version text," +
+                                                        "url text," +
+                                                        "arch text);";
     private final String DROP_HISTORY = "DROP TABLE IF EXISTS history;";
     private final String DROP_STAR = "DROP TABLE IF EXISTS star;";
 
@@ -37,8 +39,12 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     @Override
     public void onUpgrade(SQLiteDatabase sqLiteDatabase, int oldVersion, int newVersion) {
-        sqLiteDatabase.execSQL(DROP_HISTORY);
-        sqLiteDatabase.execSQL(DROP_STAR);
+        if (oldVersion == 1) {
+            sqLiteDatabase.execSQL(DROP_STAR);
+        } else {
+            sqLiteDatabase.execSQL(DROP_HISTORY);
+            sqLiteDatabase.execSQL(DROP_STAR);
+        }
         onCreate(sqLiteDatabase);
     }
 }

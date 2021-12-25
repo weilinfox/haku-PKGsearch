@@ -1,17 +1,12 @@
 package me.weilinfox.pkgsearch.searchHistory;
 
 import android.content.Context;
-import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
 import android.widget.Toast;
 
 import java.util.ArrayList;
-import java.util.Collections;
 
 import me.weilinfox.pkgsearch.R;
-import me.weilinfox.pkgsearch.database.DatabaseHelper;
-import me.weilinfox.pkgsearch.network.DebianSearcher;
 import me.weilinfox.pkgsearch.utils.HistoryList;
 
 public class SearchHistoryFactory {
@@ -28,7 +23,7 @@ public class SearchHistoryFactory {
      * 从数据库中读取搜索历史
      */
     public void readSearchHistory() {
-        this.searchHistories = HistoryList.readDatabase();
+        this.searchHistories = HistoryList.readDatabase(mContext);
     }
 
     /**
@@ -41,9 +36,9 @@ public class SearchHistoryFactory {
         }
         try {
             if (this.searchHistories.remove(item)) {
-                HistoryList.onUpdate(item);
+                HistoryList.onUpdate(mContext, item);
             } else {
-                HistoryList.onInsert(item);
+                HistoryList.onInsert(mContext, item);
             }
         } catch (Exception e) {
             Toast.makeText(mContext, R.string.database_error, Toast.LENGTH_LONG).show();
@@ -57,7 +52,7 @@ public class SearchHistoryFactory {
      * @param item
      */
     public void deleteSearchHistory(SearchHistory item) {
-        HistoryList.onRemove(item);
+        HistoryList.onRemove(mContext, item);
         this.searchHistories.remove(item);
     }
 

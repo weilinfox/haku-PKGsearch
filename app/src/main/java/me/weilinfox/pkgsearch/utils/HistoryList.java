@@ -11,9 +11,8 @@ import me.weilinfox.pkgsearch.database.DatabaseHelper;
 import me.weilinfox.pkgsearch.searchHistory.SearchHistory;
 
 public final class HistoryList {
-    private static DatabaseHelper databaseHelper = null;
     private static ArrayList<SearchHistory> searchHistories = null;
-    private static Context mContext;
+    private static String fileName = null;
     private static final String SELECT_HISTORY = "SELECT * " +
                                                     "FROM history " +
                                                     "ORDER BY time DESC;";
@@ -26,17 +25,16 @@ public final class HistoryList {
                                                     "WHERE name=? AND option=?;";
 
     public static void initDatabase(Context context) {
-        mContext = context;
-        if (databaseHelper == null) {
-            databaseHelper = new DatabaseHelper(context, context.getString(R.string.database_file), null);
-        }
+        if (fileName == null) fileName = context.getString(R.string.database_file);
     }
 
     /**
-     * 读取数据库
+     * 读取数据库缓存
+     * @param context 上下文
      * @return ArrayList<SearchHistory>
      */
-    public static ArrayList<SearchHistory> readDatabase() {
+    public static ArrayList<SearchHistory> readDatabase(Context context) {
+        DatabaseHelper databaseHelper = new DatabaseHelper(context, fileName, null);
         // 从数据库读取并缓存
         if (searchHistories == null) {
             searchHistories = new ArrayList<>();
@@ -47,6 +45,10 @@ public final class HistoryList {
                 String name, option;
                 long time;
                 do {
+                    /*
+                    android studio 一直红线提示要 >= 0 我就只好判断一下了
+                    by weilinfox
+                     */
                     pos = cursor.getColumnIndex("name");
                     if (pos < 0) continue;
                     name = cursor.getString(pos);
@@ -66,27 +68,33 @@ public final class HistoryList {
 
     /**
      * 更新搜索时间
+     * @param context 上下文
      * @param item SearchHistory
      */
-    public static void onUpdate(SearchHistory item) {
+    public static void onUpdate(Context context, SearchHistory item) {
+        DatabaseHelper databaseHelper = new DatabaseHelper(context, fileName, null);
         SQLiteDatabase database = databaseHelper.getWritableDatabase();
         database.execSQL(UPDATE_HISTORY, new String[]{Long.toString(item.getDate().getTime()), item.getKeyword(), item.getOption()});
     }
 
     /**
      * 插入
+     * @param context 上下文
      * @param item SearchHistory
      */
-    public static void onInsert(SearchHistory item) {
+    public static void onInsert(Context context, SearchHistory item) {
+        DatabaseHelper databaseHelper = new DatabaseHelper(context, fileName, null);
         SQLiteDatabase database = databaseHelper.getWritableDatabase();
         database.execSQL(INSERT_HISTORY, new String[]{item.getKeyword(), item.getOption(), Long.toString(item.getDate().getTime())});
     }
 
     /**
      * 删除记录
+     * @param context 上下文
      * @param item SearchHistory
      */
-    public static void onRemove(SearchHistory item) {
+    public static void onRemove(Context context, SearchHistory item) {
+        DatabaseHelper databaseHelper = new DatabaseHelper(context, fileName, null);
         SQLiteDatabase database = databaseHelper.getWritableDatabase();
         database.execSQL(REMOVE_HISTORY, new String[] {item.getKeyword(), item.getOption()});
     }

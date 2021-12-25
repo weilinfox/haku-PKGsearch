@@ -2,13 +2,11 @@ package me.weilinfox.pkgsearch.searchResult;
 
 import android.content.Context;
 import android.graphics.drawable.Drawable;
-import android.graphics.drawable.Icon;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
-import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -18,15 +16,10 @@ import androidx.annotation.Nullable;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
-import java.util.List;
 
 import me.weilinfox.pkgsearch.R;
 import me.weilinfox.pkgsearch.network.ArchlinuxSearcher;
 import me.weilinfox.pkgsearch.network.DebianSearcher;
-import me.weilinfox.pkgsearch.network.UbuntuSearcher;
-import me.weilinfox.pkgsearch.searchHistory.SearchHistory;
-import me.weilinfox.pkgsearch.searchHistory.SearchHistoryAdapter;
-import me.weilinfox.pkgsearch.searchHistory.SearchHistoryFactory;
 import me.weilinfox.pkgsearch.utils.StarList;
 
 public class SearchResultAdapter extends ArrayAdapter<SearchResult> {
@@ -104,13 +97,13 @@ public class SearchResultAdapter extends ArrayAdapter<SearchResult> {
                     Log.d(TAG, "onClick: unstar " + position);
                     searchResult.setStared(false);
                     viewHolder.star.setImageDrawable(SearchResultAdapter.star);
-                    StarList.deleteStar(searchResult, getContext());
+                    StarList.deleteStar(getContext(), searchResult);
                 } else {
                     // 收藏
                     Log.d(TAG, "onClick: star " + position);
                     searchResult.setStared(true);
                     viewHolder.star.setImageDrawable(SearchResultAdapter.yellowStar);
-                    StarList.addStar(searchResult, getContext());
+                    StarList.addStar(getContext(), searchResult);
                 }
             }
         });

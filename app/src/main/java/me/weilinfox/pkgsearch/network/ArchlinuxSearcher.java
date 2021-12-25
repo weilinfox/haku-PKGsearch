@@ -91,7 +91,7 @@ public class ArchlinuxSearcher extends NetworkSearcher {
     public void search(String keyword) {
         param.put("q", keyword.trim());
 
-        super.sendRequest(Constraints.archlinuxBaseUrl+Constraints.archlinuxSearchUrl, param);
+        super.sendRequest(NetworkUtils.archlinuxBaseUrl+NetworkUtils.archlinuxSearchUrl, param);
     }
 
     @Override
@@ -149,7 +149,7 @@ public class ArchlinuxSearcher extends NetworkSearcher {
                         PackageClass pkg = new PackageClass(result[2], result[3], this.mOption);
                         pkg.setArchitecture(result[0]);
                         pkg.setRepo(result[1]);
-                        pkg.setUrl(Constraints.archlinuxBaseUrl + result[7]);
+                        pkg.setUrl(NetworkUtils.archlinuxBaseUrl + result[7]);
                         pkg.setDescription(result[4]);
                         pkg.setLastUpDate(result[5]);
                         pkg.setFlagDate(result[6]);

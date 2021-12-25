@@ -14,10 +14,13 @@
     <string name="search_stared">Stared</string>
     <string name="search_unstared">Unstared</string>
     <string name="fav_title">My favourites</string>
+    <string name="fav_filter">All</string>
     <string name="quit_confirm">Press again to exit.</string>
     <string name="network_error">Network error.</string>
     <string name="database_file">main.db</string>
     <string name="database_error">Database error.</string>
+    <string name="clipboard_url">Url was copied.</string>
+    <string name="clipboard_keyword">Keyword was copied.</string>
     <string name="button_ok">OK</string>
 
     <string name="search_loongnix">Loongnix</string>

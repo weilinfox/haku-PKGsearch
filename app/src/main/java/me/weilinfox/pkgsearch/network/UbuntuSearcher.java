@@ -17,13 +17,14 @@ import me.weilinfox.pkgsearch.R;
 import me.weilinfox.pkgsearch.searchResult.SearchResult;
 import me.weilinfox.pkgsearch.utils.Constraints;
 import me.weilinfox.pkgsearch.network.DebianSearcher.PackageClass;
+import me.weilinfox.pkgsearch.utils.NetworkUtils;
 
 public class UbuntuSearcher extends DebianSearcher {
     public UbuntuSearcher(@NotNull Context context, @NotNull Handler handler) {
         super(context, handler);
         super.setOption(mContext.getResources().getString(R.string.search_ubuntu));
-        setBaseUrl(Constraints.ubuntuBaseUrl);
-        setSearchUrl(Constraints.ubuntuSearchUrl);
+        setBaseUrl(NetworkUtils.ubuntuBaseUrl);
+        setSearchUrl(NetworkUtils.ubuntuSearchUrl);
         setParam(new HashMap<String, String>() {
             {
                 put("suite", "all");

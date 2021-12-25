@@ -47,4 +47,11 @@ public class NetworkUtils {
 
         return ansUrl;
     }
+
+    public static String archlinuxBaseUrl = "https://archlinux.org/";
+    public static String archlinuxSearchUrl = "/packages/";
+    public static String debianBaseUrl = "https://packages.debian.org/";
+    public static String debianSearchUrl = "/search";
+    public static String ubuntuBaseUrl = "https://packages.ubuntu.com/";
+    public static String ubuntuSearchUrl = "/search";
 }

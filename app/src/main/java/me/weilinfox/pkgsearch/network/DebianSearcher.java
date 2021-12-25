@@ -14,13 +14,14 @@ import java.util.regex.Pattern;
 import me.weilinfox.pkgsearch.R;
 import me.weilinfox.pkgsearch.searchResult.SearchResult;
 import me.weilinfox.pkgsearch.utils.Constraints;
+import me.weilinfox.pkgsearch.utils.NetworkUtils;
 
 public class DebianSearcher extends NetworkSearcher {
 
     private static String TAG = "debianSearcher";
     private String mOption;
-    private String baseUrl = Constraints.debianBaseUrl;
-    private String searchUrl = Constraints.debianSearchUrl;
+    private String baseUrl = NetworkUtils.debianBaseUrl;
+    private String searchUrl = NetworkUtils.debianSearchUrl;
     private HashMap<String, String> param = new HashMap<String, String>() {
         {
             put("suite", "default");
