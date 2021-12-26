@@ -6,7 +6,7 @@ import me.weilinfox.pkgsearch.searchResult.SearchResult;
 
 public interface Searcher {
     void search(String keyword);
-    ArrayList<SearchResult> getResults();
+    ArrayList<SearchResult> parse();
     void sendSearchStartMessage();
     void sendSearchFinishedMessage();
     void sendSearchErrorMessage();

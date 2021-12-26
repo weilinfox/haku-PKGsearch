@@ -92,7 +92,7 @@ public class SearchResultFactory {
             public void run() {
                 Boolean flag = true;
                 try {
-                    searchResults = searcher.getResults();
+                    searchResults = searcher.parse();
                 } catch (Exception e) {
                     Log.e(TAG, "parsePackages: " + e.getStackTrace());
                     flag = false;

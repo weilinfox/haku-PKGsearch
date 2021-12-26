@@ -13,7 +13,7 @@ public abstract class HandleMessageSearcher implements Searcher {
     }
 
     /**
-     * 发送开始网络搜索消息
+     * 发送开始网络搜索消息，对应接口 search 方法
      */
     @Override
     public final void sendSearchStartMessage() {
@@ -23,7 +23,7 @@ public abstract class HandleMessageSearcher implements Searcher {
     }
 
     /**
-     * 发送结束网络搜索消息，下一步通常是进行解析
+     * 发送结束网络搜索消息，下一步通常是进行解析，即接口 parse 方法
      */
     @Override
     public final void sendSearchFinishedMessage() {

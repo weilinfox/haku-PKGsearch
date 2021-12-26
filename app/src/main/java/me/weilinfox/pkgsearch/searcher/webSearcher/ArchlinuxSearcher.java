@@ -86,7 +86,7 @@ public class ArchlinuxSearcher extends WebSearcher {
     }
 
     @Override
-    public ArrayList<SearchResult> getResults() {
+    public ArrayList<SearchResult> parse() {
         ArrayList<SearchResult> searchResults = new ArrayList<>();
 
         if (this.mContent == null) {

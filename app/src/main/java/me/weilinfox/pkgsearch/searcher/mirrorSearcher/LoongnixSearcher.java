@@ -31,7 +31,7 @@ public class LoongnixSearcher extends MirrorSearcher {
     }
 
     @Override
-    public ArrayList<SearchResult> getResults() {
+    public ArrayList<SearchResult> parse() {
         ArrayList<SearchResult> searchResults = new ArrayList<>();
 
         return searchResults;
