@@ -1,8 +1,7 @@
-package me.weilinfox.pkgsearch.network;
+package me.weilinfox.pkgsearch.searcher.webSearcher;
 
 import android.content.Context;
 import android.os.Handler;
-import android.os.Message;
 import android.util.Log;
 
 import org.jetbrains.annotations.NotNull;
@@ -19,18 +18,17 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 import me.weilinfox.pkgsearch.searchResult.SearchResult;
-import me.weilinfox.pkgsearch.utils.Constraints;
+import me.weilinfox.pkgsearch.searcher.HandleMessageSearcher;
 import me.weilinfox.pkgsearch.utils.NetworkUtils;
 
-public abstract class NetworkSearcher {
-    private static final String TAG = "NetworkSearcher";
+public abstract class WebSearcher extends HandleMessageSearcher {
+    private static final String TAG = "WebSearcher";
     protected String mContent = null;
     protected Context mContext = null;
-    protected Handler mHandler = null;
 
-    public NetworkSearcher(@NotNull Context context, @NotNull Handler handler) {
+    public WebSearcher(@NotNull Context context, @NotNull Handler handler) {
+        super(handler);
         this.mContext = context;
-        this.mHandler = handler;
     }
 
     /**
@@ -58,9 +56,7 @@ public abstract class NetworkSearcher {
         new Thread(new Runnable() {
             @Override
             public void run() {
-                Message message = Message.obtain();
-                message.what = Constraints.searchStart;
-                mHandler.sendMessage(message);
+                sendSearchStartMessage();
 
                 try {
                     String url = NetworkUtils.urlBuild(domain, param);
@@ -74,9 +70,7 @@ public abstract class NetworkSearcher {
 
                     connection.connect();
 
-                    message = Message.obtain();
-                    message.what = 20;
-                    mHandler.sendMessage(message);
+                    sendSearchProcessMessage(20);
 
                     int code = connection.getResponseCode();
                     if (code == HttpURLConnection.HTTP_OK) {
@@ -92,9 +86,8 @@ public abstract class NetworkSearcher {
                             // 防止 len == -1 的异常情况
                             now = base + bs.length()/len*50;
                             if (now > last) {
-                                message = Message.obtain();
-                                message.what = last = now;
-                                mHandler.sendMessage(message);
+                                sendSearchProcessMessage(now);
+                                last = now;
                             }
                         }
                         mContent = bs.toString();
@@ -111,9 +104,7 @@ public abstract class NetworkSearcher {
                     mContent = null;
                 }
 
-                message = Message.obtain();
-                message.what = 80;
-                mHandler.sendMessage(message);
+                sendSearchProcessMessage(80);
                 checkResult();
             }
         }).start();
@@ -123,24 +114,12 @@ public abstract class NetworkSearcher {
      * 检查搜索结果并发送对应的消息
      */
     protected final void checkResult() {
-        Message message = Message.obtain();
         if (mContent == null) {
             Log.d(TAG, "showResult: search error.");
-            message.what = Constraints.searchError;
+            sendSearchErrorMessage();
         } else {
             Log.d(TAG, "showResult: search finished.");
-            message.what = Constraints.searchFinished;
+            sendSearchFinishedMessage();
         }
-        mHandler.sendMessage(message);
-    }
-
-    protected final void searchCache(@NotNull String option) {
-        Message message = Message.obtain();
-        message.what = Constraints.searchStart;
-        mHandler.sendMessage(message);
-
-        message = Message.obtain();
-        message.what = Constraints.searchFinished;
-        mHandler.sendMessage(message);
     }
 }

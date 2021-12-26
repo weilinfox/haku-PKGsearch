@@ -1,4 +1,4 @@
-package me.weilinfox.pkgsearch.network;
+package me.weilinfox.pkgsearch.searcher.webSearcher;
 
 import android.content.Context;
 import android.os.Handler;

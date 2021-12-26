@@ -1,4 +1,4 @@
-package me.weilinfox.pkgsearch.network;
+package me.weilinfox.pkgsearch.searcher.webSearcher;
 
 import android.content.Context;
 import android.os.Handler;
@@ -15,7 +15,7 @@ import me.weilinfox.pkgsearch.R;
 import me.weilinfox.pkgsearch.searchResult.SearchResult;
 import me.weilinfox.pkgsearch.utils.NetworkUtils;
 
-public class DebianSearcher extends NetworkSearcher {
+public class DebianSearcher extends WebSearcher {
 
     private static String TAG = "debianSearcher";
     private String mOption;

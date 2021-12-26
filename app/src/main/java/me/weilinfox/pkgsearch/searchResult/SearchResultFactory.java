@@ -2,7 +2,6 @@ package me.weilinfox.pkgsearch.searchResult;
 
 import android.content.Context;
 import android.os.Handler;
-import android.os.Message;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -12,12 +11,11 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 import me.weilinfox.pkgsearch.R;
-import me.weilinfox.pkgsearch.network.ArchlinuxSearcher;
-import me.weilinfox.pkgsearch.network.DebianSearcher;
-import me.weilinfox.pkgsearch.network.LoongnixSearcher;
-import me.weilinfox.pkgsearch.network.NetworkSearcher;
-import me.weilinfox.pkgsearch.network.UbuntuSearcher;
-import me.weilinfox.pkgsearch.utils.Constraints;
+import me.weilinfox.pkgsearch.searcher.HandleMessageSearcher;
+import me.weilinfox.pkgsearch.searcher.webSearcher.ArchlinuxSearcher;
+import me.weilinfox.pkgsearch.searcher.webSearcher.DebianSearcher;
+import me.weilinfox.pkgsearch.searcher.mirrorSearcher.LoongnixSearcher;
+import me.weilinfox.pkgsearch.searcher.webSearcher.UbuntuSearcher;
 
 /**
  * 搜索结果
@@ -25,7 +23,7 @@ import me.weilinfox.pkgsearch.utils.Constraints;
 public class SearchResultFactory {
     private static final String TAG = "SearchResultFactory";
     private ArrayList<SearchResult> searchResults;
-    private NetworkSearcher networkSearcher;
+    private HandleMessageSearcher searcher;
     /**
      * 上下文
      */
@@ -74,9 +72,9 @@ public class SearchResultFactory {
             else {
                 Constructor constructor = searchClass.getDeclaredConstructor(new Class[]{Context.class, Handler.class});
                 constructor.setAccessible(true);
-                NetworkSearcher networkSearcher = (NetworkSearcher) constructor.newInstance(mContext, handler);
-                this.networkSearcher = networkSearcher;
-                networkSearcher.search(keyword);
+                HandleMessageSearcher handleMessageSearcher = (HandleMessageSearcher) constructor.newInstance(mContext, handler);
+                this.searcher = handleMessageSearcher;
+                handleMessageSearcher.search(keyword);
             }
         } catch (NoSuchMethodException | InvocationTargetException | IllegalAccessException | InstantiationException e) {
             Log.e(TAG, "searchPackages: " + e.getStackTrace());
@@ -92,17 +90,14 @@ public class SearchResultFactory {
         new Thread(new Runnable() {
             @Override
             public void run() {
-                Message message = Message.obtain();
                 Boolean flag = true;
-                message.what = Constraints.parseFinished;
                 try {
-                    searchResults = networkSearcher.getResults();
+                    searchResults = searcher.getResults();
                 } catch (Exception e) {
                     Log.e(TAG, "parsePackages: " + e.getStackTrace());
                     flag = false;
                 }
-                message.obj = flag;
-                handler.sendMessage(message);
+                searcher.sendParseFinishedMessage(flag);
             }
         }).start();
     }

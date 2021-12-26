@@ -16,8 +16,6 @@ import org.jetbrains.annotations.NotNull;
 import java.util.ArrayList;
 
 import me.weilinfox.pkgsearch.R;
-import me.weilinfox.pkgsearch.network.ArchlinuxSearcher;
-import me.weilinfox.pkgsearch.network.DebianSearcher;
 import me.weilinfox.pkgsearch.searchResult.SearchResult;
 import me.weilinfox.pkgsearch.utils.StarList;
 

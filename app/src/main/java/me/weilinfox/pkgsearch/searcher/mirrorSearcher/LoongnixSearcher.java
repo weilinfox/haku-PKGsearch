@@ -1,4 +1,4 @@
-package me.weilinfox.pkgsearch.network;
+package me.weilinfox.pkgsearch.searcher.mirrorSearcher;
 
 import android.content.Context;
 import android.os.Handler;
@@ -10,8 +10,8 @@ import java.util.ArrayList;
 import me.weilinfox.pkgsearch.R;
 import me.weilinfox.pkgsearch.searchResult.SearchResult;
 
-public class LoongnixSearcher extends NetworkSearcher {
-    private static final String TAG = "loongnixSearcher";
+public class LoongnixSearcher extends MirrorSearcher {
+    private static final String TAG = "LoongnixSearcher";
     private String mOption;
 
     public LoongnixSearcher(@NotNull Context context, @NotNull Handler handler) {
