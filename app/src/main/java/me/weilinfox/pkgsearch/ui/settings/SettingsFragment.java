@@ -12,6 +12,7 @@ import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 
+import me.weilinfox.pkgsearch.R;
 import me.weilinfox.pkgsearch.databinding.FragmentSettingsBinding;
 
 public class SettingsFragment extends Fragment {
@@ -31,7 +32,8 @@ public class SettingsFragment extends Fragment {
         settingsViewModel.getText().observe(getViewLifecycleOwner(), new Observer<String>() {
             @Override
             public void onChanged(@Nullable String s) {
-                textView.setText(s);
+                String v = s + getContext().getString(R.string.app_versionName);
+                textView.setText(v);
             }
         });
         return root;

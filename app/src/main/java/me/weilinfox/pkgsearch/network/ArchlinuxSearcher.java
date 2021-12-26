@@ -62,6 +62,7 @@ public class ArchlinuxSearcher extends NetworkSearcher {
 
         public void setRepo(String repo) {
             this.repo = repo;
+            this.setInfo(repo);
         }
 
         public void setDescription(String description) {

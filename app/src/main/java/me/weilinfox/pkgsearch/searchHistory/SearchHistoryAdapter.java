@@ -1,6 +1,7 @@
 package me.weilinfox.pkgsearch.searchHistory;
 
 import android.content.Context;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,23 +13,29 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 
 import me.weilinfox.pkgsearch.R;
 
 public class SearchHistoryAdapter extends ArrayAdapter<SearchHistory> {
+    private static final String TAG = "SearchHistoryAdapter";
     private final int resourceId;
     private SearchHistoryFactory searchHistoryFactory = null;
-
-    public SearchHistoryAdapter(@NonNull Context context, int resource, @NonNull List<SearchHistory> objects) {
-        super(context, resource, objects);
-        this.resourceId  = resource;
-    }
+    private String justNow;
+    private String minutesAgo;
+    private String hoursAgo;
+    private String daysAgo;
 
     public SearchHistoryAdapter(@NonNull Context context, int resource, @NonNull SearchHistoryFactory obj) {
         super(context, resource, obj.getSearchHistories());
         this.searchHistoryFactory = obj;
         this.resourceId  = resource;
+        justNow = context.getString(R.string.just_now);
+        minutesAgo = context.getString(R.string.minutes_ago);
+        hoursAgo = context.getString(R.string.hours_ago);
+        daysAgo = context.getString(R.string.days_ago);
     }
 
     class ViewHolder {
@@ -67,11 +74,25 @@ public class SearchHistoryAdapter extends ArrayAdapter<SearchHistory> {
             viewHolder.time.setText("");
             viewHolder.button.setVisibility(ImageButton.INVISIBLE);
         } else {
+            Long sec = (new Date().getTime() - searchHistory.getDate().getTime()) / 1000;
+            String timeText;
+            if (sec < 60) {
+                timeText = justNow;
+            } else if (sec <= 3600) {
+                timeText = Long.toString(sec/60) + " " + minutesAgo;
+            } else if (sec <= 86400) {
+                timeText = Long.toString(sec/3600) + " " + hoursAgo;
+            } else if (sec <= 2592000) {
+                timeText = Long.toString(sec/86400) + " " + daysAgo;
+            } else {
+                timeText = new SimpleDateFormat("yyyy-MM-dd").format(searchHistory.getDate());
+            }
+
             view.setEnabled(true);
             viewHolder.info.setText("");
             viewHolder.title.setText(searchHistory.getKeyword());
             viewHolder.option.setText(searchHistory.getOption());
-            viewHolder.time.setText(searchHistory.getDate().toString());
+            viewHolder.time.setText(timeText);
             viewHolder.button.setVisibility(ImageButton.VISIBLE);
             viewHolder.button.setOnClickListener(new View.OnClickListener() {
                 @Override

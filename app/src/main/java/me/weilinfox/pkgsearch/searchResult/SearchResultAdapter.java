@@ -80,12 +80,7 @@ public class SearchResultAdapter extends ArrayAdapter<SearchResult> {
         }
 
         String version = searchResult.getVersion() + ": " + searchResult.getArchitecture();
-        String info = "";
-        if (searchResult instanceof ArchlinuxSearcher.PackageClass) {
-            info = ((ArchlinuxSearcher.PackageClass) searchResult).getRepo();
-        } else if (searchResult instanceof DebianSearcher.PackageClass) {
-            info = ((DebianSearcher.PackageClass) searchResult).getDestribution();
-        }
+        String info = searchResult.getInfo();
         viewHolder.title.setText(searchResult.getName());
         viewHolder.version.setText(version);
         viewHolder.info.setText(info);

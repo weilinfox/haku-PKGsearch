@@ -10,7 +10,7 @@ public class SettingsViewModel extends ViewModel {
 
     public SettingsViewModel() {
         mText = new MutableLiveData<>();
-        mText.setValue("Haku package search v0.0.1");
+        mText.setValue("Haku package search ");
     }
 
     public LiveData<String> getText() {

@@ -52,8 +52,9 @@ public class DebianSearcher extends NetworkSearcher {
             return description;
         }
 
-        public void setDestribution(String destribution) {
-            this.distribution = destribution;
+        public void setDestribution(String distribution) {
+            this.distribution = distribution;
+            setInfo(distribution);
         }
 
         public void setDescription(String description) {

@@ -15,6 +15,7 @@ public class SearchResult implements Serializable {
     private String option;
     private String version;
     private String architecture;
+    private String info;
     private boolean stared;
 
     public SearchResult(@NotNull String name, @NotNull String version, @NotNull String option) {
@@ -50,6 +51,10 @@ public class SearchResult implements Serializable {
         this.stared = stared;
     }
 
+    public void setInfo(String info) {
+        this.info = info;
+    }
+
     public String getUrl() {
         return url;
     }
@@ -68,6 +73,10 @@ public class SearchResult implements Serializable {
 
     public String getArchitecture() {
         return architecture;
+    }
+
+    public String getInfo() {
+        return info;
     }
 
     public boolean isStared() {

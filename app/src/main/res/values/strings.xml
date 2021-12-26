@@ -1,5 +1,7 @@
 <resources>
     <string name="app_name">Haku Package Search</string>
+    <string name="app_versionName">0.0.2</string>
+
     <string name="title_search">Search</string>
     <string name="title_favourite">Favourite</string>
     <string name="title_settings">Settings</string>
@@ -21,6 +23,11 @@
     <string name="database_error">Database error.</string>
     <string name="clipboard_url">Url was copied.</string>
     <string name="clipboard_keyword">Keyword was copied.</string>
+    <string name="just_now">Just now</string>
+    <string name="days_ago">days ago</string>
+    <string name="seconds_ago">seconds ago</string>
+    <string name="minutes_ago">minutes ago</string>
+    <string name="hours_ago">hours ago</string>
     <string name="button_ok">OK</string>
 
     <string name="search_loongnix">Loongnix</string>

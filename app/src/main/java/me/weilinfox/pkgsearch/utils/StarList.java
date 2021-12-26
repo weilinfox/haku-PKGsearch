@@ -20,8 +20,8 @@ public final class StarList {
     private static final String SELECT_ALL = "SELECT * FROM star;";
     private static final String FIND_ITEM = "SELECT COUNT(*) FROM star " +
                                                 "WHERE name=? AND option=? AND version=? AND url=?;";
-    private static final String INSERT_ITEM = "INSERT INTO star(name, option, version, url, arch) " +
-                                                "VALUES(?, ?, ?, ?, ?);";
+    private static final String INSERT_ITEM = "INSERT INTO star(name, option, version, url, arch, info) " +
+                                                "VALUES(?, ?, ?, ?, ?, ?);";
     private static final String DELETE_ITEM = "DELETE FROM star " +
                                                 "WHERE name=? AND option=? AND version=? AND url=? AND arch=?;";
     private static final String SELECT_BY_PREFIX = "SELECT * FROM star WHERE option='";
@@ -80,8 +80,8 @@ public final class StarList {
     public static void addStar(@NotNull Context context, @NotNull SearchResult item) {
         DatabaseHelper databaseHelper = new DatabaseHelper(context, fileName, null);
         SQLiteDatabase db = databaseHelper.getWritableDatabase();
-        db.execSQL(INSERT_ITEM, new String[]{item.getName(), item.getOption(), item.getVersion(),
-                                                item.getUrl(), item.getArchitecture()});
+        db.execSQL(INSERT_ITEM, new String[]{item.getName(), item.getOption(), item.getVersion(), item.getUrl(),
+                                                item.getArchitecture(), item.getOption() + " " +item.getInfo()});
         Toast.makeText(context, R.string.search_stared, Toast.LENGTH_SHORT).show();
     }
 
@@ -110,7 +110,7 @@ public final class StarList {
         Cursor cursor = db.rawQuery(SELECT_BY_ITEM[item], new String[]{});
         ArrayList<SearchResult> results = new ArrayList<>();
         if (cursor.moveToFirst()) {
-            String name, option, version, url, arch;
+            String name, option, version, url, arch, info;
             SearchResult searchResult;
             int pos;
             do {
@@ -129,9 +129,13 @@ public final class StarList {
                 pos = cursor.getColumnIndex("arch");
                 if (pos < 0) continue;
                 arch = cursor.getString(pos);
+                pos = cursor.getColumnIndex("info");
+                if (pos < 0) continue;
+                info = cursor.getString(pos);
                 searchResult = new SearchResult(name, version, option);
                 searchResult.setUrl(url);
                 searchResult.setArchitecture(arch);
+                searchResult.setInfo(info);
                 results.add(searchResult);
             } while (cursor.moveToNext());
             // 数据库中最后插入的在前
