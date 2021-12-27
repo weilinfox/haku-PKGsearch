@@ -52,7 +52,7 @@ public class UpdateService extends Service {
         mView.setProgressBar(R.id.not_progress, 100, 0, false);
 
         notification.contentView = mView;*/
-        startForeground(1, notification);
+        startForeground(Constraints.updateProcessId, notification);
         super.onCreate();
     }
 
