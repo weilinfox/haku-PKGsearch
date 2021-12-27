@@ -17,7 +17,7 @@ import java.util.ArrayList;
 
 import me.weilinfox.pkgsearch.R;
 import me.weilinfox.pkgsearch.searchResult.SearchResult;
-import me.weilinfox.pkgsearch.utils.StarList;
+import me.weilinfox.pkgsearch.utils.StarUtil;
 
 public class FavouriteAdapter extends ArrayAdapter<SearchResult> {
     private final int resourceId;
@@ -66,7 +66,7 @@ public class FavouriteAdapter extends ArrayAdapter<SearchResult> {
         viewHolder.cancel.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                StarList.deleteStar(getContext(), searchResult);
+                StarUtil.deleteStar(getContext(), searchResult);
                 searchResults.remove(position);
                 notifyDataSetChanged();
             }

@@ -1,23 +1,54 @@
 package me.weilinfox.pkgsearch.searcher.mirrorSearcher;
 
 import android.content.Context;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteOpenHelper;
 import android.os.Handler;
-import android.os.Message;
 import android.util.Log;
+
+import androidx.annotation.Nullable;
 
 import org.jetbrains.annotations.NotNull;
 
+import java.io.BufferedInputStream;
+import java.io.BufferedReader;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.math.BigInteger;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.net.URLConnection;
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
+import java.util.Map;
+import java.util.zip.GZIPInputStream;
 
 import me.weilinfox.pkgsearch.searchResult.SearchResult;
 import me.weilinfox.pkgsearch.searcher.HandleMessageSearcher;
-import me.weilinfox.pkgsearch.utils.Constraints;
 
 public abstract class MirrorSearcher extends HandleMessageSearcher {
     private static final String TAG = "MirrorSearcher";
-    protected String mContent = null;
-    protected Context mContext = null;
+    protected Context mContext;
+    private static final int dbVersion = 2;
+    private static final String dbNameSuffix = "-mirror.db";
+    private static final String CREATE_MIRROR = "CREATE TABLE IF NOT EXISTS packages " +
+                                                "(name text, version text," +
+                                                "arch text, info text);";
+    private static final String CREATE_RELEASE = "CREATE TABLE IF NOT EXISTS releases(" +
+                                                "codename text, date text);";
+    private static final String DROP_MIRROR = "DROP TABLE IF EXISTS packages;";
+    private static final String DROP_RELEASE = "DROP TABLE IF EXISTS releases;";
+    private static final String INSERT_ITEM = "INSERT INTO packages(name, version, arch, info) " +
+            "VALUES(?, ?, ?, ?)";
+    private static final String INSERT_REL = "INSERT INTO releases(codename, date) " +
+            "VALUES(?, ?)";
 
     public MirrorSearcher(@NotNull Context context, @NotNull Handler handler) {
         super(handler);
@@ -35,46 +66,293 @@ public abstract class MirrorSearcher extends HandleMessageSearcher {
      * 解析搜索结果网页，转换为 SearchResult 类列表
      * @return ArrayList<SearchResult> 发生异常返回 null
      */
-    public ArrayList<SearchResult> getResults() {
+    public ArrayList<SearchResult> parse() {
         return null;
     }
 
     /**
-     * 在子线程中发送 get 请求，结果保存在 this.mContent ，handler 支持搜索进度条
-     * @param domain url
-     * @param param 参数
+     * MirrorSearcher 的数据库帮助类
      */
-    protected final void sendRequest(String domain, HashMap<String, String> param) {
-        // 连接线程
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
+    private static class MirrorHelper extends SQLiteOpenHelper {
+        public MirrorHelper(@Nullable Context context, @Nullable String name) {
+            super(context, name, null, dbVersion);
+        }
+
+        @Override
+        public void onCreate(SQLiteDatabase sqLiteDatabase) {
+            sqLiteDatabase.execSQL(CREATE_MIRROR);
+            sqLiteDatabase.execSQL(CREATE_RELEASE);
+        }
+
+        @Override
+        public void onUpgrade(SQLiteDatabase sqLiteDatabase, int oldVersion, int newVersion) {
+            if (oldVersion != 1) {
+                sqLiteDatabase.execSQL(DROP_MIRROR);
+                sqLiteDatabase.execSQL(DROP_RELEASE);
             }
-        }).start();
+            onCreate(sqLiteDatabase);
+        }
     }
 
     /**
-     * 检查搜索结果并发送对应的消息
+     * MirrorSearcher 的统一 PackageClass
      */
-    protected final void checkResult() {
-        Message message = Message.obtain();
-        if (mContent == null) {
-            Log.d(TAG, "showResult: search error.");
-            message.what = Constraints.searchError;
-        } else {
-            Log.d(TAG, "showResult: search finished.");
-            message.what = Constraints.searchFinished;
+    public static class PackageClass extends SearchResult {
+        private String description;
+
+        public PackageClass(@NotNull String name, @NotNull String version, @NotNull String option) {
+            super(name, version, option);
         }
-        mHandler.sendMessage(message);
+
+        public String getDescription() {
+            return description;
+        }
+
+        public void setDescription(String description) {
+            this.description = description;
+        }
     }
 
-    protected final void searchCache(@NotNull String option) {
-        Message message = Message.obtain();
-        message.what = Constraints.searchStart;
-        mHandler.sendMessage(message);
+    /**
+     * 从镜像缓存中搜索包
+     * @param option 选项
+     * @param keyword 关键词
+     * @return ArrayList<SearchResult>
+     */
+    protected final ArrayList<SearchResult> searchCache(@NotNull String option, @NotNull String keyword) {
+        final String SELECT_ITEM = "SELECT * FROM packages WHERE name LIKE ? ORDER BY name;";
+        sendSearchStartMessage();
 
-        message = Message.obtain();
-        message.what = Constraints.searchFinished;
-        mHandler.sendMessage(message);
+        ArrayList<SearchResult> searchResults = new ArrayList<>();
+        String dbName = option + dbNameSuffix;
+        String key = "%";
+        String[] keys = keyword.split("\\s*");
+        for (String s : keys) {
+            key = key + s + "%";
+        }
+        MirrorHelper helper = new MirrorHelper(mContext, dbName);
+        SQLiteDatabase db = helper.getReadableDatabase();
+        Cursor cursor = db.rawQuery(SELECT_ITEM, new String[]{key});
+        if (cursor.moveToFirst()) {
+            int pos;
+            PackageClass result;
+            String name, version, arch, info;
+            do {
+                pos = cursor.getColumnIndex("name");
+                if (pos < 0) continue;
+                name = cursor.getString(pos);
+                pos = cursor.getColumnIndex("version");
+                if (pos < 0) continue;
+                version = cursor.getString(pos);
+                pos = cursor.getColumnIndex("arch");
+                if (pos < 0) continue;
+                arch = cursor.getString(pos);
+                pos = cursor.getColumnIndex("info");
+                if (pos < 0) continue;
+                info = cursor.getString(pos);
+
+                result = new PackageClass(name, version, option);
+                result.setArchitecture(arch);
+                result.setCanView(false);
+                // 这里数据库模式的 info 是 Description
+                // 而类中的 info 留空，由各个继承类填充
+                result.setDescription(info);
+                searchResults.add(result);
+            } while (cursor.moveToNext());
+        }
+
+        cursor.close();
+
+        sendSearchFinishedMessage();
+
+        return searchResults;
+    }
+
+    /**
+     * 清空旧的缓存，写入新的镜像同步的缓存
+     * @param context 上下文
+     * @param option 选项
+     * @param searchResults 缓存内容
+     * @param release 新缓存版本时间
+     */
+    protected static void writeCache(Context context, String option,
+                                     @NotNull ArrayList<PackageClass> searchResults,
+                                     @NotNull HashMap<String, String> release) {
+        final String DELETE_ITEM = "DELETE FROM packages;";
+        final String DELETE_REL = "DELETE FROM releases;";
+        String dbName = option + dbNameSuffix;
+        MirrorHelper helper = new MirrorHelper(context, dbName);
+        SQLiteDatabase db = helper.getWritableDatabase();
+        db.beginTransaction();
+        try {
+            db.execSQL(DELETE_ITEM);
+            for (PackageClass r : searchResults) {
+                // 注意数据库模式中的 info 其实是类中的 description
+                db.execSQL(INSERT_ITEM, new String[]{r.getName(), r.getVersion(), r.getArchitecture(), r.getDescription()});
+            }
+            db.execSQL(DELETE_REL);
+            for (Map.Entry<String, String> entry : release.entrySet()) {
+                db.execSQL(INSERT_REL, new String[]{entry.getKey(), entry.getValue()});
+            }
+            // 提交
+            db.setTransactionSuccessful();
+        } catch (Exception e) {
+            Log.e(TAG, "writeCache: write database error " + e.getStackTrace());
+        } finally {
+            db.endTransaction();
+        }
+    }
+
+    /**
+     * 追加新的镜像同步缓存
+     * @param context 上下文
+     * @param option 选项
+     * @param searchResults 缓存内容
+     * @param release 新缓存版本时间
+     */
+    protected static void appendCache(Context context, String option,
+                                     @NotNull ArrayList<PackageClass> searchResults,
+                                     @NotNull HashMap<String, String> release) {
+        String dbName = option + dbNameSuffix;
+        MirrorHelper helper = new MirrorHelper(context, dbName);
+        SQLiteDatabase db = helper.getWritableDatabase();
+        try {
+            for (PackageClass r : searchResults) {
+                // 注意数据库模式中的 info 其实是类中的 description
+                db.execSQL(INSERT_ITEM, new String[]{r.getName(), r.getVersion(), r.getArchitecture(), r.getDescription()});
+            }
+            for (Map.Entry<String, String> entry : release.entrySet()) {
+                db.execSQL(INSERT_REL, new String[]{entry.getKey(), entry.getValue()});
+            }
+        } catch (Exception e) {
+            Log.e(TAG, "writeCache: write database error " + e.getStackTrace());
+        }
+    }
+
+    /**
+     * 检查当前缓存版本是否老旧
+     * @param context 上下文
+     * @param option 选项
+     * @param codename 缓存名
+     * @param date 缓存版本时间
+     * @return
+     */
+    protected static boolean testReleaseDate(Context context, String option, String codename, String date) {
+        final String SELECT_REL = "SELECT * FROM releases " +
+                "WHERE codename=? AND date=?;";
+        String dbName = option + dbNameSuffix;
+        MirrorHelper helper = new MirrorHelper(context, dbName);
+        SQLiteDatabase db = helper.getReadableDatabase();
+        Cursor cursor = db.rawQuery(SELECT_REL, new String[]{codename.trim(), date.trim()});
+        boolean flag = cursor.moveToFirst();
+        cursor.close();
+
+        return flag;
+    }
+
+    /**
+     * 向 url 发送 get 请求并返回获取的内容
+     * @param url url
+     * @return String 获取的内容
+     */
+    public static String getUrl(String url) {
+        String content = null;
+        try {
+            URLConnection urlConnection = new URL(url).openConnection();
+            HttpURLConnection connection = (HttpURLConnection) urlConnection;
+            connection.setRequestMethod("GET");
+            connection.setConnectTimeout(5000);
+            connection.setReadTimeout(60000);
+
+            connection.connect();
+
+            int code = connection.getResponseCode();
+            if (code == HttpURLConnection.HTTP_OK) {
+                BufferedReader bufferedReader = new BufferedReader(
+                        new InputStreamReader(connection.getInputStream(), StandardCharsets.UTF_8));
+                StringBuilder bs = new StringBuilder();
+                String t;
+                while ((t = bufferedReader.readLine()) != null) {
+                    bs.append(t).append("\n");
+                }
+                content = bs.toString();
+            }
+            connection.disconnect();
+        } catch (IOException | SecurityException e) {
+            Log.e(TAG, "sendRequest: " + e.toString());
+            content = null;
+        }
+        return content;
+    }
+
+    public static ByteArrayOutputStream getUrlBytes(String url) {
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        try {
+            URLConnection urlConnection = new URL(url).openConnection();
+            HttpURLConnection connection = (HttpURLConnection) urlConnection;
+            connection.setRequestMethod("GET");
+            connection.setConnectTimeout(5000);
+            connection.setReadTimeout(60000);
+
+            connection.connect();
+
+            int code = connection.getResponseCode();
+            if (code == HttpURLConnection.HTTP_OK) {
+                BufferedInputStream inputStream = new BufferedInputStream(connection.getInputStream());
+                byte[] buffer = new byte[8192];
+                int n;
+                while ((n = inputStream.read(buffer)) > 0) {
+                    out.write(buffer, 0, n);
+                }
+            }
+            connection.disconnect();
+        } catch (IOException | SecurityException e) {
+            Log.e(TAG, "sendRequest: " + e.toString());
+            out.reset();
+        }
+        return out;
+    }
+
+    /**
+     * gzip 校验和解压
+     * @param gzContent gzip 内容
+     * @param md5 md5 校验码
+     * @return 校验成功返回解压内容，否则为 null
+     */
+    protected static String gzipUncompress(@NotNull Context context, byte[] gzContent, String md5) {
+        try {
+            // md5 验证
+            MessageDigest digest = MessageDigest.getInstance("MD5");
+            digest.update(gzContent);
+            String hashCode = new BigInteger(1, digest.digest()).toString(16);
+            for (int i = md5.length()-hashCode.length(); i > 0; i --) {
+                hashCode = "0" + hashCode;
+            }
+            if (!hashCode.equals(md5))
+                return null;
+        } catch (Exception e) {
+            Log.e(TAG, "gzipVerify: " + e.getStackTrace());
+            return null;
+        }
+
+        // 解压
+        String fileName = "Package_" + new Date().getTime() + ".cache";
+        ByteArrayInputStream in = new ByteArrayInputStream(gzContent);
+        try {
+            int n;
+            GZIPInputStream gin = new GZIPInputStream(in);
+            FileOutputStream out = context.openFileOutput(fileName, Context.MODE_PRIVATE);
+            byte[] buffer = new byte[8192];
+            while ((n = gin.read(buffer)) > 0) {
+                out.write(buffer, 0, n);
+            }
+            out.close();
+
+            return fileName;
+        } catch (Exception e) {
+            Log.e(TAG, "gzipUncompress: " + e.getStackTrace());
+        }
+
+        return null;
     }
 }

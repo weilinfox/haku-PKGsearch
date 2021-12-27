@@ -17,6 +17,7 @@ public class SearchResult implements Serializable {
     private String architecture;
     private String info;
     private boolean stared;
+    private boolean canView;
 
     public SearchResult(@NotNull String name, @NotNull String version, @NotNull String option) {
         this.option = option;
@@ -25,6 +26,7 @@ public class SearchResult implements Serializable {
         this.url = "";
         this.architecture = "";
         this.stared = false;
+        this.canView = true;
     }
 
     public void setUrl(String url) {
@@ -55,6 +57,10 @@ public class SearchResult implements Serializable {
         this.info = info;
     }
 
+    public void setCanView(boolean canView) {
+        this.canView = canView;
+    }
+
     public String getUrl() {
         return url;
     }
@@ -81,6 +87,10 @@ public class SearchResult implements Serializable {
 
     public boolean isStared() {
         return stared;
+    }
+
+    public boolean isCanView() {
+        return canView;
     }
 
     @Override

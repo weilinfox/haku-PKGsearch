@@ -47,4 +47,7 @@ public class NetworkUtils {
     public static String debianSearchUrl = "/search";
     public static String ubuntuBaseUrl = "https://packages.ubuntu.com/";
     public static String ubuntuSearchUrl = "/search";
+
+    public static String loongnixBaseUrl = "http://pkg.loongnix.cn/loongnix/";
+    public static String loongnixDistro = "DaoXiangHu-testing";
 }

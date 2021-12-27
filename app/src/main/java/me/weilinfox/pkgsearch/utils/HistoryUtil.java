@@ -10,7 +10,7 @@ import me.weilinfox.pkgsearch.R;
 import me.weilinfox.pkgsearch.database.DatabaseHelper;
 import me.weilinfox.pkgsearch.searchHistory.SearchHistory;
 
-public final class HistoryList {
+public final class HistoryUtil {
     private static ArrayList<SearchHistory> searchHistories = null;
     private static String fileName = null;
     private static final String SELECT_HISTORY = "SELECT * " +

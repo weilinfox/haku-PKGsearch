@@ -21,7 +21,7 @@ import org.jetbrains.annotations.NotNull;
 import java.util.ArrayList;
 
 import me.weilinfox.pkgsearch.R;
-import me.weilinfox.pkgsearch.utils.StarList;
+import me.weilinfox.pkgsearch.utils.StarUtil;
 import me.weilinfox.pkgsearch.web.WebActivity;
 
 public class SearchResultActivity extends AppCompatActivity {
@@ -35,7 +35,7 @@ public class SearchResultActivity extends AppCompatActivity {
 
         // 查询是否在数据库中
         for (SearchResult r : searchResults) {
-            r.setStared(StarList.hasStar(this, r));
+            r.setStared(StarUtil.hasStar(this, r));
         }
 
         String option = intent.getStringExtra("option");
@@ -56,7 +56,20 @@ public class SearchResultActivity extends AppCompatActivity {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
                 SearchResult searchResult = searchResults.get(i);
-                WebActivity.actionStart(SearchResultActivity.this, searchResult.getUrl());
+
+                if (searchResult.isCanView()) {
+                    WebActivity.actionStart(SearchResultActivity.this, searchResult.getUrl());
+                } else {
+                    /*Intent browserIntent = new Intent(Intent.ACTION_VIEW);
+                    browserIntent.setData(Uri.parse(searchResult.getUrl()));
+                    startActivity(browserIntent);*/
+                    // 复制链接
+                    ClipboardManager clipboardManager =
+                            (ClipboardManager) SearchResultActivity.this.getSystemService(Context.CLIPBOARD_SERVICE);
+                    ClipData mClipData = ClipData.newPlainText(null, searchResult.getUrl());
+                    clipboardManager.setPrimaryClip(mClipData);
+                    Toast.makeText(SearchResultActivity.this, getResources().getString(R.string.clipboard_url), Toast.LENGTH_SHORT).show();
+                }
             }
         });
         listView.setLongClickable(true);

@@ -65,6 +65,6 @@ public class WebActivity extends AppCompatActivity {
         intent.putExtra("url", url);
         context.startActivities(new Intent[]{intent});
 
-        Log.d(TAG, "actionStart: open url " + url);
+        Log.i(TAG, "actionStart: open url " + url);
     }
 }

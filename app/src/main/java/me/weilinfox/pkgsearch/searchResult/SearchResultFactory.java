@@ -97,6 +97,8 @@ public class SearchResultFactory {
                     Log.e(TAG, "parsePackages: " + e.getStackTrace());
                     flag = false;
                 }
+                if (searchResults == null)
+                    flag = false;
                 searcher.sendParseFinishedMessage(flag);
             }
         }).start();

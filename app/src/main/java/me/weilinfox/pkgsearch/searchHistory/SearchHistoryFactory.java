@@ -7,7 +7,7 @@ import android.widget.Toast;
 import java.util.ArrayList;
 
 import me.weilinfox.pkgsearch.R;
-import me.weilinfox.pkgsearch.utils.HistoryList;
+import me.weilinfox.pkgsearch.utils.HistoryUtil;
 
 public class SearchHistoryFactory {
     private static final String TAG = "SearchHistoryFactory";
@@ -15,7 +15,7 @@ public class SearchHistoryFactory {
     private Context mContext;
 
     public SearchHistoryFactory(Context context) {
-        HistoryList.initDatabase(context);
+        HistoryUtil.initDatabase(context);
         this.mContext = context;
     }
 
@@ -23,7 +23,7 @@ public class SearchHistoryFactory {
      * 从数据库中读取搜索历史
      */
     public void readSearchHistory() {
-        this.searchHistories = HistoryList.readDatabase(mContext);
+        this.searchHistories = HistoryUtil.readDatabase(mContext);
     }
 
     /**
@@ -36,9 +36,9 @@ public class SearchHistoryFactory {
         }
         try {
             if (this.searchHistories.remove(item)) {
-                HistoryList.onUpdate(mContext, item);
+                HistoryUtil.onUpdate(mContext, item);
             } else {
-                HistoryList.onInsert(mContext, item);
+                HistoryUtil.onInsert(mContext, item);
             }
         } catch (Exception e) {
             Toast.makeText(mContext, R.string.database_error, Toast.LENGTH_LONG).show();
@@ -52,7 +52,7 @@ public class SearchHistoryFactory {
      * @param item
      */
     public void deleteSearchHistory(SearchHistory item) {
-        HistoryList.onRemove(mContext, item);
+        HistoryUtil.onRemove(mContext, item);
         this.searchHistories.remove(item);
     }
 

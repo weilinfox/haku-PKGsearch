@@ -18,7 +18,7 @@ import org.jetbrains.annotations.NotNull;
 import java.util.ArrayList;
 
 import me.weilinfox.pkgsearch.R;
-import me.weilinfox.pkgsearch.utils.StarList;
+import me.weilinfox.pkgsearch.utils.StarUtil;
 
 public class SearchResultAdapter extends ArrayAdapter<SearchResult> {
     private final int resourceId;
@@ -90,13 +90,13 @@ public class SearchResultAdapter extends ArrayAdapter<SearchResult> {
                     Log.d(TAG, "onClick: unstar " + position);
                     searchResult.setStared(false);
                     viewHolder.star.setImageDrawable(SearchResultAdapter.star);
-                    StarList.deleteStar(getContext(), searchResult);
+                    StarUtil.deleteStar(getContext(), searchResult);
                 } else {
                     // 收藏
                     Log.d(TAG, "onClick: star " + position);
                     searchResult.setStared(true);
                     viewHolder.star.setImageDrawable(SearchResultAdapter.yellowStar);
-                    StarList.addStar(getContext(), searchResult);
+                    StarUtil.addStar(getContext(), searchResult);
                 }
             }
         });

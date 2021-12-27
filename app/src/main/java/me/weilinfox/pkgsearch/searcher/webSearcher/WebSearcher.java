@@ -24,7 +24,7 @@ import me.weilinfox.pkgsearch.utils.NetworkUtils;
 public abstract class WebSearcher extends HandleMessageSearcher {
     private static final String TAG = "WebSearcher";
     protected String mContent = null;
-    protected Context mContext = null;
+    protected Context mContext;
 
     public WebSearcher(@NotNull Context context, @NotNull Handler handler) {
         super(handler);
@@ -66,7 +66,7 @@ public abstract class WebSearcher extends HandleMessageSearcher {
                     // 不压缩网页，防止 getContentLength() 长度异常
                     connection.setRequestProperty("Accept-Encoding", "identity");
                     connection.setConnectTimeout(5000);
-                    connection.setReadTimeout(10000);
+                    connection.setReadTimeout(5000);
 
                     connection.connect();
 
@@ -115,10 +115,10 @@ public abstract class WebSearcher extends HandleMessageSearcher {
      */
     protected final void checkResult() {
         if (mContent == null) {
-            Log.d(TAG, "showResult: search error.");
+            Log.e(TAG, "showResult: search error.");
             sendSearchErrorMessage();
         } else {
-            Log.d(TAG, "showResult: search finished.");
+            Log.i(TAG, "showResult: search finished.");
             sendSearchFinishedMessage();
         }
     }

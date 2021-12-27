@@ -27,10 +27,14 @@
             android:name=".web.WebActivity"
             android:launchMode="singleTask">
         </activity>
+
+        <service android:name=".searcher.mirrorSearcher.updateService.UpdateService">
+        </service>
     </application>
 
     <uses-permission android:name="android.permission.INTERNET"/>
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE"/>
 
 </manifest>

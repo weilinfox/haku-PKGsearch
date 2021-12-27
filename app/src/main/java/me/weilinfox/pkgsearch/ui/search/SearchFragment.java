@@ -96,7 +96,7 @@ public class SearchFragment extends Fragment {
                     progressDialog = null;
                     Boolean flag = (Boolean) message.obj;
                     if (flag) {
-                        Log.d(TAG, "handleMessage: show search page.");
+                        Log.i(TAG, "handleMessage: show search page.");
                         ArrayList<SearchResult> res = searchResultFactory.getSearchResults();
                         if (res.size() == 0) {
                             AlertDialog.Builder dialog = new AlertDialog.Builder(getActivity());
@@ -111,7 +111,7 @@ public class SearchFragment extends Fragment {
                         } else {
                             // 显示结果页面
                             SearchResultActivity.actionStart(getContext(), searchResultFactory.getSearchResults(), searchOption);
-                            Log.d(TAG, "handleMessage: show search results.");
+                            Log.i(TAG, "handleMessage: show search results.");
                         }
                     } else {
                         onToast(getResources().getString(R.string.search_error));

@@ -24,7 +24,7 @@ import me.weilinfox.pkgsearch.R;
 import me.weilinfox.pkgsearch.databinding.FragmentFavouriteBinding;
 import me.weilinfox.pkgsearch.searchResult.SearchResult;
 import me.weilinfox.pkgsearch.utils.NavigationViewUtil;
-import me.weilinfox.pkgsearch.utils.StarList;
+import me.weilinfox.pkgsearch.utils.StarUtil;
 import me.weilinfox.pkgsearch.web.WebActivity;
 
 public class FavouriteFragment extends Fragment {
@@ -67,7 +67,7 @@ public class FavouriteFragment extends Fragment {
         // 设置 ListView 适配器
         Log.d(TAG, "setupListView: on option index " + index);
         ListView favView = binding.favList;
-        ArrayList<SearchResult> searchResults = StarList.getStarByOption(getContext(), index);
+        ArrayList<SearchResult> searchResults = StarUtil.getStarByOption(getContext(), index);
         FavouriteAdapter adapter = new FavouriteAdapter(getContext(), R.layout.fav_item, searchResults, null);
         favView.setAdapter(adapter);
         favView.setOnItemClickListener(new AdapterView.OnItemClickListener() {

@@ -9,7 +9,7 @@ import org.jetbrains.annotations.NotNull;
 import java.util.ArrayList;
 
 import me.weilinfox.pkgsearch.searchResult.SearchResult;
-import me.weilinfox.pkgsearch.utils.StarList;
+import me.weilinfox.pkgsearch.utils.StarUtil;
 
 public class FavouriteViewModel extends ViewModel {
 
@@ -18,6 +18,6 @@ public class FavouriteViewModel extends ViewModel {
     }
 
     public ArrayList<SearchResult> getStarList(@NotNull Context context, int index) {
-        return StarList.getStarByOption(context, index);
+        return StarUtil.getStarByOption(context, index);
     }
 }

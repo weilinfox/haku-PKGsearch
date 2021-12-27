@@ -15,7 +15,7 @@ import me.weilinfox.pkgsearch.R;
 import me.weilinfox.pkgsearch.database.DatabaseHelper;
 import me.weilinfox.pkgsearch.searchResult.SearchResult;
 
-public final class StarList {
+public final class StarUtil {
     private static String fileName = null;
     private static final String SELECT_ALL = "SELECT * FROM star;";
     private static final String FIND_ITEM = "SELECT COUNT(*) FROM star " +

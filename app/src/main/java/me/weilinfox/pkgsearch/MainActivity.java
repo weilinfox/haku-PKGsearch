@@ -20,9 +20,10 @@ import androidx.navigation.ui.NavigationUI;
 import java.util.ArrayList;
 
 import me.weilinfox.pkgsearch.databinding.ActivityMainBinding;
+import me.weilinfox.pkgsearch.searcher.mirrorSearcher.updateService.UpdateService;
 import me.weilinfox.pkgsearch.utils.Constraints;
 import me.weilinfox.pkgsearch.utils.NavigationViewUtil;
-import me.weilinfox.pkgsearch.utils.StarList;
+import me.weilinfox.pkgsearch.utils.StarUtil;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -87,7 +88,11 @@ public class MainActivity extends AppCompatActivity {
         }
 
         // 初始化数据库
-        StarList.initDatabase(this);
+        StarUtil.initDatabase(this);
+
+        // 初始化服务
+        UpdateService.startService(this);
+        UpdateService.startRepeating(this);
     }
 
     @Override
