@@ -17,5 +17,7 @@ public class Constraints {
      * 镜像 update 状态通知 id
      */
     public static final int updateSuccessId = 1;
-    public static final int updateFailId = 2;
+    public static final int updateFailBaseId = 2;
+
+    public static final String notificationChannelId = "HakuNotify";
 }

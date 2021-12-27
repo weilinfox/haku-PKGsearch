@@ -7,6 +7,7 @@ import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
+import android.os.Build;
 import android.os.IBinder;
 import android.util.Log;
 import android.widget.RemoteViews;
@@ -32,11 +33,20 @@ public class UpdateService extends Service {
     @Override
     public void onCreate() {
         Log.i(TAG, "onCreate: create UpdateService.");
-        Notification notification = new NotificationCompat.Builder(getApplicationContext())
-                .setContentTitle(getResources().getString(R.string.update_title))
-                .setWhen(System.currentTimeMillis())
-                .setSmallIcon(R.drawable.ic_baseline_refresh_white_24)
-                .build();
+        Notification notification;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            notification = new NotificationCompat.Builder(getApplicationContext(), Constraints.notificationChannelId)
+                    .setContentTitle(getResources().getString(R.string.update_title))
+                    .setWhen(System.currentTimeMillis())
+                    .setSmallIcon(R.drawable.ic_baseline_refresh_white_24)
+                    .build();
+        } else {
+            notification = new NotificationCompat.Builder(getApplicationContext())
+                    .setContentTitle(getResources().getString(R.string.update_title))
+                    .setWhen(System.currentTimeMillis())
+                    .setSmallIcon(R.drawable.ic_baseline_refresh_white_24)
+                    .build();
+        }
         /*mView = new RemoteViews(getPackageName(), R.layout.notification_item);
         mView.setTextViewText(R.id.not_text, getResources().getString(R.string.update_title));
         mView.setProgressBar(R.id.not_progress, 100, 0, false);
@@ -56,8 +66,8 @@ public class UpdateService extends Service {
                 if (! LoongnixSearcher.updateMirror(getApplicationContext())) {
                     Log.e(TAG, "onStartCommand: update Loongnix mirror error.");
                     flag = false;
-                    // 失败通知
-                    showNotification(Constraints.updateFailId, "Loongnix mirror update failed.");
+                    // 失败通知 如果有多个，则由 updateFailBaseId 开始依次累加
+                    showNotification(Constraints.updateFailBaseId, "Loongnix mirror update failed.");
                 }
 
                 if (flag) {
@@ -85,7 +95,11 @@ public class UpdateService extends Service {
 
     public static void startService(Context context) {
         Intent intent = new Intent(context, UpdateService.class);
-        context.startService(intent);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            context.startForegroundService(intent);
+        } else {
+            context.startService(intent);
+        }
     }
 
     public static void stopRepeating(Context context) {
@@ -95,27 +109,41 @@ public class UpdateService extends Service {
 
     private void showNotification(int code, String message) {
         NotificationManager notificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
-        Notification notification = null;
+        Notification notification;
         switch (code) {
             case Constraints.updateSuccessId:
-                notification = new NotificationCompat.Builder(getApplicationContext())
-                        .setContentText(getResources().getString(R.string.update_success))
-                        .setWhen(System.currentTimeMillis())
-                        .setSmallIcon(R.drawable.ic_baseline_done_24)
-                        .build();
-                break;
-            case Constraints.updateFailId:
-                notification = new NotificationCompat.Builder(getApplicationContext())
-                        .setContentTitle(getResources().getString(R.string.update_failed))
-                        .setSettingsText(message)
-                        .setWhen(System.currentTimeMillis())
-                        .setSmallIcon(R.drawable.ic_baseline_close_24)
-                        .build();
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                    notification = new NotificationCompat.Builder(getApplicationContext(), Constraints.notificationChannelId)
+                            .setContentText(getResources().getString(R.string.update_success))
+                            .setWhen(System.currentTimeMillis())
+                            .setSmallIcon(R.drawable.ic_baseline_done_24)
+                            .build();
+                } else {
+                    notification = new NotificationCompat.Builder(getApplicationContext())
+                            .setContentText(getResources().getString(R.string.update_success))
+                            .setWhen(System.currentTimeMillis())
+                            .setSmallIcon(R.drawable.ic_baseline_done_24)
+                            .build();
+                }
                 break;
             default:
-                return;
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                    notification = new NotificationCompat.Builder(getApplicationContext(), Constraints.notificationChannelId)
+                            .setContentTitle(getResources().getString(R.string.update_failed))
+                            .setSettingsText(message)
+                            .setWhen(System.currentTimeMillis())
+                            .setSmallIcon(R.drawable.ic_baseline_close_24)
+                            .build();
+                } else {
+                    notification = new NotificationCompat.Builder(getApplicationContext())
+                            .setContentTitle(getResources().getString(R.string.update_failed))
+                            .setSettingsText(message)
+                            .setWhen(System.currentTimeMillis())
+                            .setSmallIcon(R.drawable.ic_baseline_close_24)
+                            .build();
+                }
+                break;
         }
-        notificationManager.cancel(Constraints.updateSuccessId);
         notificationManager.notify(code, notification);
     }
 }

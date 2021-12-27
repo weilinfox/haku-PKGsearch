@@ -1,6 +1,8 @@
 package me.weilinfox.pkgsearch;
 
 import android.Manifest;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
@@ -89,6 +91,19 @@ public class MainActivity extends AppCompatActivity {
 
         // 初始化数据库
         StarUtil.initDatabase(this);
+
+        // 通知 channel
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            NotificationManager notificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+            NotificationChannel channel = new NotificationChannel(
+                    Constraints.notificationChannelId, Constraints.notificationChannelId,
+                    NotificationManager.IMPORTANCE_DEFAULT
+            );
+            channel.setDescription(Constraints.notificationChannelId);
+            channel.enableLights(false);
+            channel.setSound(null, null);
+            notificationManager.createNotificationChannel(channel);
+        }
 
         // 初始化服务
         UpdateService.startService(this);
