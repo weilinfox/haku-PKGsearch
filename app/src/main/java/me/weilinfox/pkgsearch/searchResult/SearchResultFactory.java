@@ -53,6 +53,13 @@ public class SearchResultFactory {
     }
 
     public ArrayList<SearchResult> getSearchResults() {
+        if (searchResults.size() > 100) {
+            ArrayList<SearchResult> tmp = new ArrayList<>();
+            for (int i = 0; i < 100; i++) {
+                tmp.add(searchResults.get(i));
+            }
+            searchResults = tmp;
+        }
         return searchResults;
     }
 

@@ -136,15 +136,16 @@ public class LoongnixSearcher extends MirrorSearcher {
                         if (line.charAt(0) == ' ') continue;
                         if (! line.contains(":")) continue;
                         String[] ln = line.split(":", 2);
-                        if (ln[0].trim().equals("Package")) {
+                        ln[0] = ln[0].trim();
+                        if (ln[0].equals("Package")) {
                             pkg = ln[1].trim();
-                        } else if (ln[0].trim().equals("Version")) {
+                        } else if (ln[0].equals("Version")) {
                             version = ln[1].trim();
-                        } else if (ln[0].trim().equals("Architecture")) {
+                        } else if (ln[0].equals("Architecture")) {
                             arch = ln[1].trim();
-                        } else if (ln[0].trim().equals("Filename")) {
+                        } else if (ln[0].equals("Filename")) {
                             file = ln[1].trim();
-                        } else if (ln[0].trim().equals("Description")) {
+                        } else if (ln[0].equals("Description")) {
                             desc = ln[1].trim();
                         }
                     }

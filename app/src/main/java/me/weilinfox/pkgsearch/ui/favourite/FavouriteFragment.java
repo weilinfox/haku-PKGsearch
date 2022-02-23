@@ -74,6 +74,7 @@ public class FavouriteFragment extends Fragment {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
                 SearchResult searchResult = searchResults.get(i);
+                if (! searchResult.isCanView()) return;
                 String url = searchResult.getUrl();
 
                 WebActivity.actionStart(getContext(), url);

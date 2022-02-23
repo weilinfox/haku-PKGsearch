@@ -251,8 +251,6 @@ public class SearchFragment extends Fragment {
         // TODO: 取消焦点
         Log.d(TAG, "Search: " + keyword + " on " + option);
 
-        // TODO: 添加历史
-
         progressDialog.setProgress(5);
 
         if (! searchResultFactory.searchPackages(keyword, option)) {

@@ -88,7 +88,7 @@ public class UpdateService extends Service {
     public static void startRepeating(Context context) {
         AlarmManager mirrorAlarm = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
         Intent intent = new Intent(context, UpdateService.class);
-        updateIntent = PendingIntent.getService(context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+        updateIntent = PendingIntent.getService(context, 0, intent, PendingIntent.FLAG_IMMUTABLE | PendingIntent.FLAG_UPDATE_CURRENT);
         mirrorAlarm.setRepeating(AlarmManager.RTC, System.currentTimeMillis() + AlarmManager.INTERVAL_HOUR,
                                                 AlarmManager.INTERVAL_HOUR, updateIntent);
     }

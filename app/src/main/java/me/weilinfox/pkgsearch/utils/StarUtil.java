@@ -19,11 +19,11 @@ public final class StarUtil {
     private static String fileName = null;
     private static final String SELECT_ALL = "SELECT * FROM star;";
     private static final String FIND_ITEM = "SELECT COUNT(*) FROM star " +
-                                                "WHERE name=? AND option=? AND version=? AND url=?;";
-    private static final String INSERT_ITEM = "INSERT INTO star(name, option, version, url, arch, info) " +
-                                                "VALUES(?, ?, ?, ?, ?, ?);";
+                                                "WHERE name=? AND option=? AND version=?;";
+    private static final String INSERT_ITEM = "INSERT INTO star(name, option, version, url, arch, info, canview) " +
+                                                "VALUES(?, ?, ?, ?, ?, ?, ?);";
     private static final String DELETE_ITEM = "DELETE FROM star " +
-                                                "WHERE name=? AND option=? AND version=? AND url=? AND arch=?;";
+                                                "WHERE name=? AND option=? AND version=? AND arch=?;";
     private static final String SELECT_BY_PREFIX = "SELECT * FROM star WHERE option='";
     private static final String SELECT_BY_SUFFIX = "';";
     private static String[] SELECT_BY_ITEM = null;
@@ -65,7 +65,7 @@ public final class StarUtil {
         DatabaseHelper databaseHelper = new DatabaseHelper(context, fileName, null);
         SQLiteDatabase db = databaseHelper.getWritableDatabase();
         Cursor cursor = db.rawQuery(FIND_ITEM, new String[]{item.getName(), item.getOption(),
-                                                item.getVersion(), item.getUrl()});
+                                                item.getVersion()});
         cursor.moveToFirst();
         Long cnt = cursor.getLong(0);
         cursor.close();
@@ -81,7 +81,8 @@ public final class StarUtil {
         DatabaseHelper databaseHelper = new DatabaseHelper(context, fileName, null);
         SQLiteDatabase db = databaseHelper.getWritableDatabase();
         db.execSQL(INSERT_ITEM, new String[]{item.getName(), item.getOption(), item.getVersion(), item.getUrl(),
-                                                item.getArchitecture(), item.getOption() + " " +item.getInfo()});
+                                                item.getArchitecture(), item.getOption() + " " +item.getInfo(),
+                                                item.isCanView() ? "1" : "0" });
         Toast.makeText(context, R.string.search_stared, Toast.LENGTH_SHORT).show();
     }
 
@@ -94,7 +95,7 @@ public final class StarUtil {
         DatabaseHelper databaseHelper = new DatabaseHelper(context, fileName, null);
         SQLiteDatabase db = databaseHelper.getWritableDatabase();
         db.execSQL(DELETE_ITEM, new String[]{item.getName(), item.getOption(), item.getVersion(),
-                                                item.getUrl(), item.getArchitecture()});
+                                                item.getArchitecture()});
         Toast.makeText(context, R.string.search_unstared, Toast.LENGTH_SHORT).show();
     }
 
@@ -111,6 +112,7 @@ public final class StarUtil {
         ArrayList<SearchResult> results = new ArrayList<>();
         if (cursor.moveToFirst()) {
             String name, option, version, url, arch, info;
+            int canView;
             SearchResult searchResult;
             int pos;
             do {
@@ -132,10 +134,14 @@ public final class StarUtil {
                 pos = cursor.getColumnIndex("info");
                 if (pos < 0) continue;
                 info = cursor.getString(pos);
+                pos = cursor.getColumnIndex("canview");
+                if (pos < 0) continue;
+                canView = cursor.getInt(pos);
                 searchResult = new SearchResult(name, version, option);
                 searchResult.setUrl(url);
                 searchResult.setArchitecture(arch);
                 searchResult.setInfo(info);
+                searchResult.setCanView(canView != 0);
                 results.add(searchResult);
             } while (cursor.moveToNext());
             // 数据库中最后插入的在前

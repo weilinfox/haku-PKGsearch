@@ -36,19 +36,19 @@ import me.weilinfox.pkgsearch.searcher.HandleMessageSearcher;
 public abstract class MirrorSearcher extends HandleMessageSearcher {
     private static final String TAG = "MirrorSearcher";
     protected Context mContext;
-    private static final int dbVersion = 2;
+    private static final int dbVersion = 3;
     private static final String dbNameSuffix = "-mirror.db";
     private static final String CREATE_MIRROR = "CREATE TABLE IF NOT EXISTS packages " +
                                                 "(name text, version text," +
-                                                "arch text, info text);";
+                                                "arch text, info text, url text);";
     private static final String CREATE_RELEASE = "CREATE TABLE IF NOT EXISTS releases(" +
                                                 "codename text, date text);";
     private static final String DROP_MIRROR = "DROP TABLE IF EXISTS packages;";
     private static final String DROP_RELEASE = "DROP TABLE IF EXISTS releases;";
-    private static final String INSERT_ITEM = "INSERT INTO packages(name, version, arch, info) " +
-            "VALUES(?, ?, ?, ?)";
+    private static final String INSERT_ITEM = "INSERT INTO packages(name, version, arch, info, url) " +
+                                                "VALUES(?, ?, ?, ?, ?)";
     private static final String INSERT_REL = "INSERT INTO releases(codename, date) " +
-            "VALUES(?, ?)";
+                                                "VALUES(?, ?)";
 
     public MirrorSearcher(@NotNull Context context, @NotNull Handler handler) {
         super(handler);
@@ -86,9 +86,18 @@ public abstract class MirrorSearcher extends HandleMessageSearcher {
 
         @Override
         public void onUpgrade(SQLiteDatabase sqLiteDatabase, int oldVersion, int newVersion) {
-            if (oldVersion != 1) {
-                sqLiteDatabase.execSQL(DROP_MIRROR);
-                sqLiteDatabase.execSQL(DROP_RELEASE);
+            switch (oldVersion) {
+                case 1:
+                    break;
+                case 2:
+                    String addUrl = "ALTER TABLE packages ADD url text;";
+                    sqLiteDatabase.execSQL(addUrl);
+                    sqLiteDatabase.execSQL(DROP_RELEASE);
+                    break;
+                default:
+                    sqLiteDatabase.execSQL(DROP_MIRROR);
+                    sqLiteDatabase.execSQL(DROP_RELEASE);
+                    break;
             }
             onCreate(sqLiteDatabase);
         }
@@ -136,7 +145,7 @@ public abstract class MirrorSearcher extends HandleMessageSearcher {
         if (cursor.moveToFirst()) {
             int pos;
             PackageClass result;
-            String name, version, arch, info;
+            String name, version, arch, info, url;
             do {
                 pos = cursor.getColumnIndex("name");
                 if (pos < 0) continue;
@@ -150,9 +159,13 @@ public abstract class MirrorSearcher extends HandleMessageSearcher {
                 pos = cursor.getColumnIndex("info");
                 if (pos < 0) continue;
                 info = cursor.getString(pos);
+                pos = cursor.getColumnIndex("url");
+                if (pos < 0) continue;
+                url = cursor.getString(pos);
 
                 result = new PackageClass(name, version, option);
                 result.setArchitecture(arch);
+                result.setUrl(url);
                 result.setCanView(false);
                 // 这里数据库模式的 info 是 Description
                 // 而类中的 info 留空，由各个继承类填充
@@ -188,7 +201,7 @@ public abstract class MirrorSearcher extends HandleMessageSearcher {
             db.execSQL(DELETE_ITEM);
             for (PackageClass r : searchResults) {
                 // 注意数据库模式中的 info 其实是类中的 description
-                db.execSQL(INSERT_ITEM, new String[]{r.getName(), r.getVersion(), r.getArchitecture(), r.getDescription()});
+                db.execSQL(INSERT_ITEM, new String[]{r.getName(), r.getVersion(), r.getArchitecture(), r.getDescription(), r.getUrl()});
             }
             db.execSQL(DELETE_REL);
             for (Map.Entry<String, String> entry : release.entrySet()) {
@@ -219,7 +232,7 @@ public abstract class MirrorSearcher extends HandleMessageSearcher {
         try {
             for (PackageClass r : searchResults) {
                 // 注意数据库模式中的 info 其实是类中的 description
-                db.execSQL(INSERT_ITEM, new String[]{r.getName(), r.getVersion(), r.getArchitecture(), r.getDescription()});
+                db.execSQL(INSERT_ITEM, new String[]{r.getName(), r.getVersion(), r.getArchitecture(), r.getDescription(), r.getUrl()});
             }
             for (Map.Entry<String, String> entry : release.entrySet()) {
                 db.execSQL(INSERT_REL, new String[]{entry.getKey(), entry.getValue()});
